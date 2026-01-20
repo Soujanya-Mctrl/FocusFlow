@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { ListTodo, Settings, BarChart2 } from "lucide-react";
+import { ListTodo, Settings, BarChart2, User } from "lucide-react";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 interface DockIconProps {
     icon: React.ElementType;
@@ -51,6 +52,8 @@ interface SidebarDockProps {
 }
 
 export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
+    const router = useRouter();
+
     return (
         <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -77,6 +80,12 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     label="Settings"
                     isActive={activePanel === 'settings'}
                     onClick={() => onTogglePanel('settings')}
+                />
+                <DockIcon
+                    icon={User}
+                    label="Profile"
+                    isActive={false} // Always false for now as it navigates away
+                    onClick={() => router.push('/login')}
                 />
             </div>
         </motion.div>
