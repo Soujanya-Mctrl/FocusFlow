@@ -170,7 +170,7 @@ export function FocusScreen() {
                 </div>
 
                 {/* Quotes Area - Separated from the center hub for breathing room */}
-                <div className={`mt-4 sm:mt-8 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0' : 'opacity-100'}`}>
+                <div className="mt-4 sm:mt-8 transition-opacity duration-1000">
                     <QuoteDisplay />
                 </div>
             </div>

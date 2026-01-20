@@ -22,24 +22,33 @@ interface TimerState {
     restartCurrentSession: () => void;
 }
 
-export const useTimerStore = create<TimerState>((set) => ({
-    mode: 'idle',
-    remainingTime: 25 * 60,
-    isRunning: false,
-    activeTaskId: undefined,
-    backgroundMode: 'gradient',
-    breaksLeft: 4,
+import { persist } from 'zustand/middleware';
 
-    setMode: (mode) => set({ mode }),
-    setRemainingTime: (remainingTime) => set({ remainingTime }),
-    setIsRunning: (isRunning) => set({ isRunning }),
-    setActiveTaskId: (activeTaskId) => set({ activeTaskId }),
-    setBackgroundMode: (backgroundMode) => set({ backgroundMode }),
-    setBreaksLeft: (breaksLeft) => set({ breaksLeft }),
-    toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
-    resetTimer: () => set({ remainingTime: 25 * 60, isRunning: false, mode: 'idle', breaksLeft: 4 }),
-    restartCurrentSession: () => set((state) => ({
-        remainingTime: state.mode === 'break' ? 5 * 60 : 25 * 60,
-        isRunning: false
-    })),
-}));
+export const useTimerStore = create<TimerState>()(
+    persist(
+        (set) => ({
+            mode: 'idle',
+            remainingTime: 25 * 60,
+            isRunning: false,
+            activeTaskId: undefined,
+            backgroundMode: 'gradient',
+            breaksLeft: 4,
+
+            setMode: (mode) => set({ mode }),
+            setRemainingTime: (remainingTime) => set({ remainingTime }),
+            setIsRunning: (isRunning) => set({ isRunning }),
+            setActiveTaskId: (activeTaskId) => set({ activeTaskId }),
+            setBackgroundMode: (backgroundMode) => set({ backgroundMode }),
+            setBreaksLeft: (breaksLeft) => set({ breaksLeft }),
+            toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
+            resetTimer: () => set({ remainingTime: 25 * 60, isRunning: false, mode: 'idle', breaksLeft: 4 }),
+            restartCurrentSession: () => set((state) => ({
+                remainingTime: state.mode === 'break' ? 5 * 60 : 25 * 60,
+                isRunning: false
+            })),
+        }),
+        {
+            name: 'focus-flow-timer',
+        }
+    )
+);
