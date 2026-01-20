@@ -18,19 +18,18 @@ export function ActiveTaskLabel() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-3 text-xl font-medium text-text-primary"
+                    className="text-4xl font-bold text-white tracking-tight"
                 >
-                    <span>🎯</span>
-                    <span>{activeTask.title}</span>
+                    {activeTask.title}
                 </motion.div>
             ) : (
                 <motion.div
                     key="placeholder"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-lg text-text-muted italic"
+                    className="text-2xl font-medium text-white/40 italic"
                 >
-                    Select a task...
+                    No active task
                 </motion.div>
             )}
         </AnimatePresence>

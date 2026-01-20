@@ -10,13 +10,11 @@ export function PrimaryActionButton() {
     return (
         <motion.button
             onClick={toggleTimer}
-            layout
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
             whileTap={{ scale: 0.95 }}
-            className="group relative flex items-center gap-3 rounded-full bg-bg-panel px-8 py-4 text-lg font-medium text-text-primary transition-colors hover:bg-white/10"
+            className="px-10 py-2.5 rounded-full border-2 border-white/80 text-sm font-bold tracking-widest text-white transition-colors"
         >
-            {isRunning ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 pl-1" />}
-            {isRunning ? 'Pause Focus' : 'Start Focus'}
+            {isRunning ? 'PAUSE' : 'START'}
         </motion.button>
     );
 }

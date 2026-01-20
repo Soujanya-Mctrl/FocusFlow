@@ -4,26 +4,61 @@ import { useTimerStore } from "@/store/useTimerStore";
 import { motion } from "framer-motion";
 
 export function ProgressRing() {
-    // Determine progress based on total time (assuming 25min for simplicity for now, 
-    // ideally store should track total duration vs remaining)
     const { remainingTime, mode } = useTimerStore();
-    const totalTime = 25 * 60;
-    const progress = 1 - (remainingTime / totalTime);
+    const totalTime = mode === 'focus' ? 25 * 60 : 5 * 60;
+    const progress = (remainingTime / totalTime);
 
-    // Don't show progress if idle
-    if (mode === 'idle' && remainingTime === totalTime) return null;
+    // Circle Config
+    const radius = 300;
+    const stroke = 4;
+    const normalizedRadius = radius - stroke * 2;
+    const circumference = normalizedRadius * 2 * Math.PI;
+
+    // Arc Config (300 degree arc, 60 degree gap at bottom)
+    const arcAngle = 300;
+    const arcLength = (arcAngle / 360) * circumference;
+    const gapLength = circumference - arcLength;
+
+    // Progress Calculation within the arc
+    // When progress is 1 (start), offset should be 0
+    // When progress is 0 (end), offset should be arcLength
+    const strokeDashoffset = (1 - progress) * arcLength;
 
     return (
-        <div className="absolute bottom-12 w-full max-w-sm px-6">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-bg-panel">
-                <motion.div
-                    className="h-full bg-focus rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress * 100}%` }}
-                    transition={{ duration: 1, ease: "linear" }}
-                    style={{ opacity: 0.5 }}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none">
+            <svg
+                height={radius * 2}
+                width={radius * 2}
+                style={{ transform: 'rotate(120deg)' }} // Rotated so the 60deg gap is at the bottom
+            >
+                {/* Track Arc */}
+                <circle
+                    stroke="rgba(255, 255, 255, 0.15)"
+                    strokeWidth={stroke}
+                    fill="transparent"
+                    strokeDasharray={`${arcLength} ${gapLength}`}
+                    strokeLinecap="round"
+                    r={normalizedRadius}
+                    cx={radius}
+                    cy={radius}
                 />
-            </div>
+                {/* Progress Arc */}
+                <motion.circle
+                    stroke="white"
+                    fill="transparent"
+                    strokeWidth={stroke}
+                    strokeDasharray={`${arcLength} ${gapLength}`}
+                    style={{ strokeDashoffset }}
+                    strokeLinecap="round"
+                    r={normalizedRadius}
+                    cx={radius}
+                    cy={radius}
+                    initial={{ strokeDashoffset: arcLength }}
+                    animate={{ strokeDashoffset }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+                />
+            </svg>
         </div>
     );
 }

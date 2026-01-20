@@ -5,20 +5,32 @@ import { TimerDisplay } from './TimerDisplay';
 import { ActiveTaskLabel } from './ActiveTaskLabel';
 import { PrimaryActionButton } from './PrimaryActionButton';
 import { ProgressRing } from './ProgressRing';
+import { SidebarDock } from '../layout/SidebarDock';
+import { SidePanel } from '../layout/SidePanel';
 import { TaskPanel } from './TaskPanel';
 import { useTimerStore } from '@/store/useTimerStore';
 import { useTaskStore } from '@/store/useTaskStore';
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { playSound, SOUNDS } from '@/utils/sound';
 
 export function FocusScreen() {
     const { isRunning, remainingTime, setRemainingTime, setIsRunning, mode, setMode, toggleTimer } = useTimerStore();
-    const { isPanelOpen, setPanelOpen } = useTaskStore();
+    // note: We use local state for panel interaction now instead of global isPanelOpen, 
+    // or we sync them. For now let's use local state for the Dock system to be self-contained
+    // BUT we need to support Ctrl+Space opening Tasks.
 
-    // Ref to track previous running state to trigger sounds correctly
+    // We can map 'activePanel' string to the Dock.
+    const [activePanel, setActivePanel] = useState<string | null>(null);
+
     const prevIsRunning = useRef(isRunning);
 
+    // Sync Key shortcut to activePanel
+    const toggleTaskPanel = useCallback(() => {
+        setActivePanel(prev => prev === 'tasks' ? null : 'tasks');
+    }, []);
+
+    // Sound Effects
     useEffect(() => {
         if (prevIsRunning.current !== isRunning) {
             if (isRunning) {
@@ -30,6 +42,7 @@ export function FocusScreen() {
         }
     }, [isRunning, remainingTime, mode]);
 
+    // Timer Interval
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
@@ -37,21 +50,17 @@ export function FocusScreen() {
             interval = setInterval(() => {
                 setRemainingTime(remainingTime - 1);
             }, 1000);
-        } else if (remainingTime === 0 && isRunning) { // logic check needed here
-            // It's tricky because remainingTime update triggers this effect.
         }
 
-        // Better to handle completion inside the interval or separate effect
         if (remainingTime === 0 && prevIsRunning.current) {
             setIsRunning(false);
             playSound(SOUNDS.COMPLETE);
-            // setMode('break'); 
         }
 
         return () => clearInterval(interval);
-    }, [isRunning, remainingTime, setRemainingTime, setIsRunning, setMode]);
+    }, [isRunning, remainingTime, setRemainingTime, setIsRunning]);
 
-    // Update mode based on running state if needed, or handle in button
+    // Mode Auto-Switch
     useEffect(() => {
         if (isRunning && mode === 'idle') {
             setMode('focus');
@@ -60,7 +69,6 @@ export function FocusScreen() {
 
     // Keyboard Shortcuts
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        // Disable shortcuts if typing in an input
         if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') return;
 
         if (e.code === 'Space' && !e.ctrlKey) {
@@ -68,12 +76,11 @@ export function FocusScreen() {
             toggleTimer();
         }
 
-        // Ctrl + Space -> Toggle task panel
         if (e.ctrlKey && e.code === 'Space') {
             e.preventDefault();
-            setPanelOpen(!isPanelOpen);
+            toggleTaskPanel();
         }
-    }, [toggleTimer, isPanelOpen, setPanelOpen]);
+    }, [toggleTimer, toggleTaskPanel]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
@@ -81,31 +88,54 @@ export function FocusScreen() {
     }, [handleKeyDown]);
 
     return (
-        <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden text-text-primary">
+        <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden text-text-primary">
             <BackgroundRenderer />
 
-            {/* Main Focus Area */}
-            <div className="z-10 flex flex-col items-center gap-12 text-center">
+            <SidebarDock
+                activePanel={activePanel}
+                onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
+            />
 
-                {/* Header / Mode */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-sm font-medium tracking-widest text-text-muted uppercase"
-                >
-                    [ Focus Mode ]
-                </motion.div>
+            {/* Panels */}
+            <SidePanel
+                isOpen={activePanel === 'tasks'}
+                onClose={() => setActivePanel(null)}
+                title="Tasks"
+            >
+                <TaskPanel />
+            </SidePanel>
 
-                <TimerDisplay />
+            <SidePanel
+                isOpen={activePanel === 'settings'}
+                onClose={() => setActivePanel(null)}
+                title="Settings"
+            >
+                <div className="p-4 text-center text-text-muted">
+                    Settings coming soon...
+                </div>
+            </SidePanel>
+            <SidePanel
+                isOpen={activePanel === 'stats'}
+                onClose={() => setActivePanel(null)}
+                title="Statistics"
+            >
+                <div className="p-4 text-center text-text-muted">
+                    Stats coming soon...
+                </div>
+            </SidePanel>
 
-                <ActiveTaskLabel />
-
-                <PrimaryActionButton />
+            {/* Main Content Area */}
+            <div className="z-10 flex flex-col items-center justify-center gap-12 w-full max-w-4xl px-4">
+                <div className="relative flex items-center justify-center w-[600px] h-[600px]">
+                    <ProgressRing />
+                    <div className="flex flex-col items-center gap-8">
+                        <TimerDisplay />
+                        <ActiveTaskLabel />
+                        <PrimaryActionButton />
+                    </div>
+                </div>
             </div>
 
-            <ProgressRing />
-
-            <TaskPanel />
         </main>
     );
 }

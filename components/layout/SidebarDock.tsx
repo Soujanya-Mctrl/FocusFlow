@@ -25,7 +25,7 @@ function DockIcon({ icon: Icon, label, isActive, onClick }: DockIconProps) {
             {isActive && (
                 <motion.div
                     layoutId="active-pill"
-                    className="absolute left-0 h-full w-1 bg-accent rounded-r-full"
+                    className="absolute bottom-0 w-full h-1 bg-accent rounded-t-full"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
@@ -42,12 +42,12 @@ interface SidebarDockProps {
 
 export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
     return (
-        <motion.aside
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/5 p-2 shadow-2xl"
+        <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="fixed top-6 left-6 z-50 flex items-center gap-2 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/5 p-2 shadow-2xl"
         >
-            <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
                 <DockIcon
                     icon={ListTodo}
                     label="Tasks"
@@ -60,7 +60,7 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     isActive={activePanel === 'stats'}
                     onClick={() => onTogglePanel('stats')}
                 />
-                <div className="h-px w-full bg-white/10 my-1" />
+                <div className="w-px h-6 bg-white/10 mx-1" />
                 <DockIcon
                     icon={Settings}
                     label="Settings"
@@ -68,6 +68,6 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     onClick={() => onTogglePanel('settings')}
                 />
             </div>
-        </motion.aside>
+        </motion.div>
     );
 }
