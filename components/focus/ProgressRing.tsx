@@ -9,7 +9,7 @@ export function ProgressRing() {
     const progress = (remainingTime / totalTime);
 
     // Circle Config
-    const radius = 380;
+    const radius = 450;
     const stroke = 8;
     const normalizedRadius = radius - stroke * 2;
     const circumference = normalizedRadius * 2 * Math.PI;
@@ -40,7 +40,7 @@ export function ProgressRing() {
                         >
                             {/* Track Arc (Subtle low-opacity) */}
                             <circle
-                                stroke="rgba(255, 255, 255, 0.1)"
+                                stroke="rgba(255, 255, 255, 0.06)"
                                 strokeWidth={stroke}
                                 fill="transparent"
                                 strokeDasharray={`${arcLength} ${gapLength}`}
@@ -51,7 +51,7 @@ export function ProgressRing() {
                             />
                             {/* Progress Arc (White active portion) */}
                             <motion.circle
-                                stroke="rgba(255, 255, 255, 0.8)"
+                                stroke="rgba(255, 255, 255, 0.5)"
                                 fill="transparent"
                                 strokeWidth={stroke}
                                 strokeDasharray={`${elapsedProgress * arcLength} ${circumference - (elapsedProgress * arcLength)}`}

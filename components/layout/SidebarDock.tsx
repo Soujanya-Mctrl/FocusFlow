@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { ListTodo, Settings, BarChart2, User } from "lucide-react";
+import { CheckSquare, TrendingUp, Sliders, UserCircle } from "lucide-react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 
@@ -18,12 +18,12 @@ function DockIcon({ icon: Icon, label, isActive, onClick, shortcut }: DockIconPr
         <button
             onClick={onClick}
             className={clsx(
-                "group relative flex items-center justify-center p-3 transition-all rounded-xl",
-                isActive ? "text-white bg-white/10" : "text-text-secondary hover:text-white hover:bg-white/5"
+                "group relative flex items-center justify-center p-2 transition-all rounded-lg",
+                isActive ? "text-white" : "text-white/40 hover:text-white"
             )}
             title={label}
         >
-            <Icon className="w-6 h-6" />
+            <Icon className="w-5 h-5" strokeWidth={2} />
 
             {shortcut && (
                 <div className="absolute -bottom-2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
@@ -58,31 +58,31 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
         <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="fixed top-6 left-6 z-50 flex items-center gap-2 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/5 p-2 shadow-2xl"
+            className="fixed top-4 left-4 z-50 flex items-center gap-1 p-1"
         >
             <div className="flex items-center gap-2">
                 <DockIcon
-                    icon={ListTodo}
+                    icon={CheckSquare}
                     label="Tasks"
                     isActive={activePanel === 'tasks'}
                     onClick={() => onTogglePanel('tasks')}
                     shortcut="Ctrl + Space"
                 />
                 <DockIcon
-                    icon={BarChart2}
+                    icon={TrendingUp}
                     label="Stats"
                     isActive={activePanel === 'stats'}
                     onClick={() => onTogglePanel('stats')}
                 />
-                <div className="w-px h-6 bg-white/10 mx-1" />
+                {/* <div className="w-px h-6 bg-white/10 mx-1" /> */}
                 <DockIcon
-                    icon={Settings}
+                    icon={Sliders}
                     label="Settings"
                     isActive={activePanel === 'settings'}
                     onClick={() => onTogglePanel('settings')}
                 />
                 <DockIcon
-                    icon={User}
+                    icon={UserCircle}
                     label="Profile"
                     isActive={false} // Always false for now as it navigates away
                     onClick={() => router.push('/login')}
