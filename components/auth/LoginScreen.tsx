@@ -10,12 +10,12 @@ export function LoginScreen() {
         <main className="relative flex h-screen w-full items-center justify-center overflow-hidden text-text-primary">
             <BackgroundRenderer />
 
-            <div className="z-10 w-full max-w-lg p-8">
+            <div className="z-10 w-full max-w-lg p-4 sm:p-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex flex-col items-center gap-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-10 shadow-2xl"
+                    className="flex flex-col items-center gap-6 sm:gap-8 rounded-[2rem] sm:rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl p-6 sm:p-10 shadow-2xl"
                 >
                     {/* Header */}
                     <div className="text-center space-y-2">

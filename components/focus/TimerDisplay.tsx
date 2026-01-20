@@ -35,7 +35,7 @@ export function TimerDisplay() {
             {/* Timer Digits - The Center Anchor */}
             <motion.div
                 layout
-                className="text-[11rem] font-semibold leading-none tracking-[0.02em] tabular-nums select-none cursor-pointer text-white"
+                className="text-[6rem] sm:text-[8rem] md:text-[11rem] font-semibold leading-none tracking-[0.02em] tabular-nums select-none cursor-pointer text-white"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}

@@ -23,7 +23,7 @@ export function ProgressRing() {
     const elapsedProgress = 1 - progress;
 
     return (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%-40px)] z-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%-40px)] z-0 pointer-events-none w-full h-full flex items-center justify-center">
             <AnimatePresence>
                 {mode !== 'idle' && (
                     <motion.div
@@ -31,10 +31,11 @@ export function ProgressRing() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="w-full h-full flex items-center justify-center"
                     >
                         <svg
-                            height={radius * 2}
-                            width={radius * 2}
+                            viewBox={`0 0 ${radius * 2} ${radius * 2}`}
+                            className="w-full h-full max-w-[760px] max-h-[760px]"
                             style={{ transform: 'rotate(135deg)' }} // Rotated so the 90deg gap is at the bottom
                         >
                             {/* Track Arc (Subtle low-opacity) */}

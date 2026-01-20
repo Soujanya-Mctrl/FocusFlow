@@ -113,43 +113,46 @@ export function FocusScreen() {
             <BackgroundRenderer />
 
             <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                <SidebarDock
-                    activePanel={activePanel}
-                    onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
-                />
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 sm:top-6 sm:left-6 sm:translate-x-0 z-50">
+                    <SidebarDock
+                        activePanel={activePanel}
+                        onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
+                    />
+                </div>
             </div>
 
-            {/* Panels */}
-            <SidePanel
-                isOpen={activePanel === 'tasks'}
-                onClose={() => setActivePanel(null)}
-                title="Tasks"
-            >
-                <TaskPanel />
-            </SidePanel>
-            {/* ... other panels ... */}
-            <SidePanel
-                isOpen={activePanel === 'settings'}
-                onClose={() => setActivePanel(null)}
-                title="Settings"
-            >
-                <div className="p-4 text-center text-text-muted">
-                    Settings coming soon...
-                </div>
-            </SidePanel>
-            <SidePanel
-                isOpen={activePanel === 'stats'}
-                onClose={() => setActivePanel(null)}
-                title="Statistics"
-            >
-                <div className="p-4 text-center text-text-muted">
-                    Stats coming soon...
-                </div>
-            </SidePanel>
+            {/* Panels - Responsive Width */}
+            <div className="z-[60]">
+                <SidePanel
+                    isOpen={activePanel === 'tasks'}
+                    onClose={() => setActivePanel(null)}
+                    title="Tasks"
+                >
+                    <TaskPanel />
+                </SidePanel>
+                <SidePanel
+                    isOpen={activePanel === 'settings'}
+                    onClose={() => setActivePanel(null)}
+                    title="Settings"
+                >
+                    <div className="p-4 text-center text-text-muted">
+                        Settings coming soon...
+                    </div>
+                </SidePanel>
+                <SidePanel
+                    isOpen={activePanel === 'stats'}
+                    onClose={() => setActivePanel(null)}
+                    title="Statistics"
+                >
+                    <div className="p-4 text-center text-text-muted">
+                        Stats coming soon...
+                    </div>
+                </SidePanel>
+            </div>
 
             {/* Main Content Area */}
-            <div className="z-10 flex flex-col items-center justify-center w-full max-w-5xl px-4 scale-[0.90] mt-10 transform-gpu -translate-y-5">
-                <div className="relative flex items-center justify-center w-[700px] h-[700px]">
+            <div className={`z-10 flex flex-col items-center justify-center w-full px-4 h-full transform-gpu transition-all duration-1000 ${isUserIdle ? 'scale-100 translate-y-0' : 'scale-[0.85] sm:scale-95 md:scale-100 mt-2 sm:mt-10 md:translate-y-[-2rem]'}`}>
+                <div className="relative flex items-center justify-center w-full aspect-square max-w-[min(700px,75vh)]">
                     <ProgressRing />
 
                     {/* The Heart: Perfectly Centered Timer */}
@@ -158,7 +161,7 @@ export function FocusScreen() {
                     </div>
 
                     {/* The Context: Task & Action positioned below the center line */}
-                    <div className={`absolute top-[75%] flex flex-col items-center gap-10 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 delay-150' : 'opacity-100'}`}>
+                    <div className={`absolute top-[75%] flex flex-col items-center gap-6 sm:gap-10 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 delay-150' : 'opacity-100'}`}>
                         <ActiveTaskLabel />
                         <div className="mt-2">
                             <PrimaryActionButton />
@@ -167,7 +170,7 @@ export function FocusScreen() {
                 </div>
 
                 {/* Quotes Area - Separated from the center hub for breathing room */}
-                <div className="mt-8">
+                <div className={`mt-4 sm:mt-8 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0' : 'opacity-100'}`}>
                     <QuoteDisplay />
                 </div>
             </div>

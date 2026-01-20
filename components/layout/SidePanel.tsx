@@ -19,7 +19,7 @@ export function SidePanel({ isOpen, onClose, title, children }: SidePanelProps) 
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -20, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="fixed left-6 top-24 bottom-6 z-40 w-80 flex flex-col rounded-2xl bg-black/80 backdrop-blur-xl border border-white/5 shadow-2xl overflow-hidden"
+                    className="fixed inset-x-4 top-24 bottom-4 sm:left-6 sm:right-auto sm:top-24 sm:bottom-6 z-40 w-auto sm:w-80 flex flex-col rounded-2xl bg-black/80 backdrop-blur-xl border border-white/5 shadow-2xl overflow-hidden"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between p-4 border-b border-white/5">
