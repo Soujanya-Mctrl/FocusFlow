@@ -5,6 +5,7 @@ import { TimerDisplay } from './TimerDisplay';
 import { ActiveTaskLabel } from './ActiveTaskLabel';
 import { PrimaryActionButton } from './PrimaryActionButton';
 import { ProgressRing } from './ProgressRing';
+import { QuoteDisplay } from './QuoteDisplay';
 import { SidebarDock } from '../layout/SidebarDock';
 import { SidePanel } from '../layout/SidePanel';
 import { TaskPanel } from './TaskPanel';
@@ -16,9 +17,6 @@ import { playSound, SOUNDS } from '@/utils/sound';
 
 export function FocusScreen() {
     const { isRunning, remainingTime, setRemainingTime, setIsRunning, mode, setMode, toggleTimer } = useTimerStore();
-    // note: We use local state for panel interaction now instead of global isPanelOpen, 
-    // or we sync them. For now let's use local state for the Dock system to be self-contained
-    // BUT we need to support Ctrl+Space opening Tasks.
 
     // We can map 'activePanel' string to the Dock.
     const [activePanel, setActivePanel] = useState<string | null>(null);
@@ -87,14 +85,39 @@ export function FocusScreen() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
+    // Idle Detection for "Zen Mode"
+    const [isUserIdle, setIsUserIdle] = useState(false);
+    const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        const resetIdleTimer = () => {
+            setIsUserIdle(false);
+            if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+            idleTimeoutRef.current = setTimeout(() => setIsUserIdle(true), 3000);
+        };
+
+        window.addEventListener('mousemove', resetIdleTimer);
+        window.addEventListener('click', resetIdleTimer);
+
+        resetIdleTimer();
+
+        return () => {
+            window.removeEventListener('mousemove', resetIdleTimer);
+            window.removeEventListener('click', resetIdleTimer);
+            if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+        };
+    }, []);
+
     return (
-        <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden text-text-primary">
+        <main className={`relative flex h-screen w-full items-center justify-center overflow-hidden text-text-primary ${isUserIdle ? 'cursor-none' : ''}`}>
             <BackgroundRenderer />
 
-            <SidebarDock
-                activePanel={activePanel}
-                onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
-            />
+            <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <SidebarDock
+                    activePanel={activePanel}
+                    onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
+                />
+            </div>
 
             {/* Panels */}
             <SidePanel
@@ -104,7 +127,7 @@ export function FocusScreen() {
             >
                 <TaskPanel />
             </SidePanel>
-
+            {/* ... other panels ... */}
             <SidePanel
                 isOpen={activePanel === 'settings'}
                 onClose={() => setActivePanel(null)}
@@ -125,14 +148,27 @@ export function FocusScreen() {
             </SidePanel>
 
             {/* Main Content Area */}
-            <div className="z-10 flex flex-col items-center justify-center gap-12 w-full max-w-4xl px-4">
-                <div className="relative flex items-center justify-center w-[600px] h-[600px]">
+            <div className="z-10 flex flex-col items-center justify-center w-full max-w-5xl px-4 scale-[0.90] mt-10 transform-gpu -translate-y-5">
+                <div className="relative flex items-center justify-center w-[700px] h-[700px]">
                     <ProgressRing />
-                    <div className="flex flex-col items-center gap-8">
+
+                    {/* The Heart: Perfectly Centered Timer */}
+                    <div className={`z-20 transition-transform duration-1000 ${isUserIdle ? 'translate-y-10' : ''}`}>
                         <TimerDisplay />
-                        <ActiveTaskLabel />
-                        <PrimaryActionButton />
                     </div>
+
+                    {/* The Context: Task & Action positioned below the center line */}
+                    <div className={`absolute top-[75%] flex flex-col items-center gap-10 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 delay-150' : 'opacity-100'}`}>
+                        <ActiveTaskLabel />
+                        <div className="mt-2">
+                            <PrimaryActionButton />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quotes Area - Separated from the center hub for breathing room */}
+                <div className="mt-8">
+                    <QuoteDisplay />
                 </div>
             </div>
 

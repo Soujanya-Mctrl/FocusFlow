@@ -9,9 +9,10 @@ interface DockIconProps {
     label: string;
     isActive: boolean;
     onClick: () => void;
+    shortcut?: string;
 }
 
-function DockIcon({ icon: Icon, label, isActive, onClick }: DockIconProps) {
+function DockIcon({ icon: Icon, label, isActive, onClick, shortcut }: DockIconProps) {
     return (
         <button
             onClick={onClick}
@@ -22,6 +23,15 @@ function DockIcon({ icon: Icon, label, isActive, onClick }: DockIconProps) {
             title={label}
         >
             <Icon className="w-6 h-6" />
+
+            {shortcut && (
+                <div className="absolute -bottom-2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                    <div className="flex items-center justify-center rounded border border-white/20 bg-black/80 px-1.5 py-0.5 text-[9px] uppercase tracking-normal text-white shadow-xl">
+                        {shortcut}
+                    </div>
+                </div>
+            )}
+
             {isActive && (
                 <motion.div
                     layoutId="active-pill"
@@ -53,6 +63,7 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     label="Tasks"
                     isActive={activePanel === 'tasks'}
                     onClick={() => onTogglePanel('tasks')}
+                    shortcut="Ctrl + Space"
                 />
                 <DockIcon
                     icon={BarChart2}
