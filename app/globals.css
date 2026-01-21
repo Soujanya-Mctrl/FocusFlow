@@ -2,10 +2,10 @@
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  
+
   --color-bg-black: #000000;
   --color-bg-dark: #0B0F14;
-  --color-bg-panel: rgba(255,255,255,0.04);
+  --color-bg-panel: rgba(255, 255, 255, 0.04);
 
   --color-text-primary: #E6EAF0;
   --color-text-secondary: #9AA4B2;
@@ -25,4 +25,8 @@
 
 body {
   font-family: var(--font-sans);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }

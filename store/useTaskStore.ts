@@ -16,12 +16,40 @@ interface TaskState {
     removeTask: (id: string) => void;
     toggleTaskCompletion: (id: string) => void;
     setPanelOpen: (isOpen: boolean) => void;
+    resetTasks: () => void;
 }
+
+const SEED_TASKS: Task[] = [
+    {
+        id: '1',
+        title: 'Marketing brief',
+        completed: false,
+        createdAt: Date.now(),
+    },
+    {
+        id: '2',
+        title: 'Insta post',
+        completed: false,
+        createdAt: Date.now() - 1000,
+    },
+    {
+        id: '3',
+        title: 'Call mum',
+        completed: false,
+        createdAt: Date.now() - 2000,
+    },
+    {
+        id: '4',
+        title: 'Fire Jeffry',
+        completed: false,
+        createdAt: Date.now() - 3000,
+    }
+];
 
 export const useTaskStore = create<TaskState>()(
     persist(
         (set) => ({
-            tasks: [],
+            tasks: SEED_TASKS,
             isPanelOpen: false,
 
             addTask: (title) => set((state) => ({
@@ -47,6 +75,8 @@ export const useTaskStore = create<TaskState>()(
             })),
 
             setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
+
+            resetTasks: () => set({ tasks: SEED_TASKS }),
         }),
         {
             name: 'focus-flow-tasks',

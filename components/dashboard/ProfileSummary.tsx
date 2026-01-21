@@ -13,7 +13,7 @@ export function ProfileSummary() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 p-2">
+        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 p-2 w-full">
 
             {/* User Info */}
             <div className="flex items-center gap-6 mr-auto">
@@ -27,7 +27,7 @@ export function ProfileSummary() {
             </div>
 
             {/* Key Metrics */}
-            <div className="flex gap-8 md:gap-16 w-full md:w-auto justify-between md:justify-end">
+            <div className="flex gap-4 sm:gap-8 md:gap-16 w-full md:w-auto justify-between md:justify-end mt-4 md:mt-0 border-t border-white/5 md:border-t-0 pt-4 md:pt-0">
                 {/* Streak */}
                 <div className="flex flex-col items-center md:items-end gap-1">
                     <div className="flex items-center gap-2 text-accent">

@@ -7,7 +7,7 @@ import { useState } from "react";
 import clsx from "clsx";
 
 export function TaskPanel() {
-    const { tasks, addTask, removeTask, toggleTaskCompletion } = useTaskStore();
+    const { tasks, addTask, removeTask, toggleTaskCompletion, resetTasks } = useTaskStore();
     const { activeTaskId, setActiveTaskId } = useTimerStore();
     const [newTaskTitle, setNewTaskTitle] = useState("");
 
@@ -49,8 +49,14 @@ export function TaskPanel() {
             {/* Task List */}
             <div className="flex-1 space-y-2">
                 {tasks.length === 0 && (
-                    <div className="text-center py-8 text-sm text-gray-500">
-                        No tasks yet.
+                    <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
+                        <span className="text-sm text-gray-500">No tasks yet.</span>
+                        <button
+                            onClick={resetTasks}
+                            className="text-xs px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors border border-white/5"
+                        >
+                            Load Demo Tasks
+                        </button>
                     </div>
                 )}
 

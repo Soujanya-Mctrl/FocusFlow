@@ -23,7 +23,7 @@ export function ProgressRing() {
     const elapsedProgress = 1 - progress;
 
     return (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[calc(50%-40px)] z-0 pointer-events-none w-full h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center">
             <AnimatePresence>
                 {mode !== 'idle' && (
                     <motion.div

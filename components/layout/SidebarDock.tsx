@@ -26,7 +26,7 @@ function DockIcon({ icon: Icon, label, isActive, onClick, shortcut }: DockIconPr
             <Icon className="w-5 h-5" strokeWidth={2} />
 
             {shortcut && (
-                <div className="absolute -bottom-2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                <div className="hidden sm:block absolute -bottom-2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                     <div className="flex items-center justify-center rounded border border-white/20 bg-black/80 px-1.5 py-0.5 text-[9px] uppercase tracking-normal text-white shadow-xl">
                         {shortcut}
                     </div>
@@ -56,11 +56,11 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
 
     return (
         <motion.div
-            initial={{ y: -20, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="fixed top-4 left-4 z-50 flex items-center gap-1 p-1"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 md:top-16 md:bottom-auto md:left-6 md:translate-x-0 z-50 flex items-center gap-1 p-1.5 rounded-full bg-transparent"
         >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
                 <DockIcon
                     icon={CheckSquare}
                     label="Tasks"
@@ -81,12 +81,7 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     isActive={activePanel === 'settings'}
                     onClick={() => onTogglePanel('settings')}
                 />
-                <DockIcon
-                    icon={UserCircle}
-                    label="Profile"
-                    isActive={false} // Always false for now as it navigates away
-                    onClick={() => router.push('/dashboard')}
-                />
+
             </div>
         </motion.div>
     );

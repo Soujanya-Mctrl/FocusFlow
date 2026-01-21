@@ -30,7 +30,7 @@ export const useTimerStore = create<TimerState>()(
             mode: 'idle',
             remainingTime: 25 * 60,
             isRunning: false,
-            activeTaskId: undefined,
+            activeTaskId: '1',
             backgroundMode: 'gradient',
             breaksLeft: 4,
 
@@ -44,7 +44,8 @@ export const useTimerStore = create<TimerState>()(
             resetTimer: () => set({ remainingTime: 25 * 60, isRunning: false, mode: 'idle', breaksLeft: 4 }),
             restartCurrentSession: () => set((state) => ({
                 remainingTime: state.mode === 'break' ? 5 * 60 : 25 * 60,
-                isRunning: false
+                isRunning: false,
+                mode: 'idle'
             })),
         }),
         {

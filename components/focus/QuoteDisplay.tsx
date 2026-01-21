@@ -58,7 +58,7 @@ export function QuoteDisplay() {
     }, [mode]);
 
     return (
-        <div className="mt-4 max-w-4xl mx-auto text-center px-8 min-h-[96px]">
+        <div className="relative z-50 max-w-4xl mx-auto text-center px-8">
             <AnimatePresence mode="wait">
                 {mode !== 'idle' && quote && !loading ? (
                     <motion.div
@@ -82,7 +82,7 @@ export function QuoteDisplay() {
                         }}
                         className="flex flex-col gap-4"
                     >
-                        <p className="text-lg font-light text-white/40 leading-relaxed tracking-tight select-none">
+                        <p className="text-sm sm:text-lg font-light text-white/40 leading-relaxed tracking-tight select-none">
                             "{quote.quote}"
                         </p>
                         <div className="flex items-center justify-center gap-3">

@@ -41,7 +41,7 @@ export function FocusHeatmap() {
                 <h3 className="text-xl font-bold text-white">Focus History</h3>
 
                 {/* View Toggles */}
-                <div className="flex items-center p-1 rounded-xl bg-black/40 border border-white/5">
+                <div className="flex flex-wrap items-center p-1 rounded-xl bg-black/40 border border-white/5">
                     {(['daily', 'monthly', 'yearly'] as ViewMode[]).map((mode) => (
                         <button
                             key={mode}
@@ -58,7 +58,7 @@ export function FocusHeatmap() {
             </div>
 
             {/* Heatmap Grid */}
-            <div className="relative w-full overflow-x-auto custom-scrollbar pb-2">
+            <div className="relative w-full max-w-[85vw] sm:max-w-full overflow-x-auto custom-scrollbar pb-2">
                 <div className="min-w-max flex gap-1">
                     {/* Render simplistic column-based grid for "Daily" view */}
                     {Array.from({ length: 12 }).map((_, weekIndex) => (

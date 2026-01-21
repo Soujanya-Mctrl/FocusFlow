@@ -7,6 +7,7 @@ import { PrimaryActionButton } from './PrimaryActionButton';
 import { ProgressRing } from './ProgressRing';
 import { QuoteDisplay } from './QuoteDisplay';
 import { SidebarDock } from '../layout/SidebarDock';
+import { StatusHeader } from '../layout/StatusHeader';
 import { SidePanel } from '../layout/SidePanel';
 import { TaskPanel } from './TaskPanel';
 import { useTimerStore } from '@/store/useTimerStore';
@@ -14,9 +15,12 @@ import { useTaskStore } from '@/store/useTaskStore';
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { playSound, SOUNDS } from '@/utils/sound';
+import { Coffee, UserCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function FocusScreen() {
-    const { isRunning, remainingTime, setRemainingTime, setIsRunning, mode, setMode, toggleTimer } = useTimerStore();
+    const router = useRouter();
+    const { isRunning, remainingTime, setRemainingTime, setIsRunning, mode, setMode, toggleTimer, breaksLeft } = useTimerStore();
 
     // We can map 'activePanel' string to the Dock.
     const [activePanel, setActivePanel] = useState<string | null>(null);
@@ -98,27 +102,43 @@ export function FocusScreen() {
 
         window.addEventListener('mousemove', resetIdleTimer);
         window.addEventListener('click', resetIdleTimer);
+        window.addEventListener('touchstart', resetIdleTimer); // Add touchstart for mobile responsiveness
 
         resetIdleTimer();
 
         return () => {
             window.removeEventListener('mousemove', resetIdleTimer);
             window.removeEventListener('click', resetIdleTimer);
+            window.removeEventListener('touchstart', resetIdleTimer);
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
         };
     }, []);
 
     return (
-        <main className={`relative flex h-screen w-full items-center justify-center overflow-hidden text-text-primary ${isUserIdle ? 'cursor-none' : ''}`}>
+        <main className={`relative flex h-[100svh] w-full items-center justify-center overflow-y-auto overflow-x-hidden sm:overflow-hidden text-text-primary ${isUserIdle ? 'cursor-none' : ''}`}>
             <BackgroundRenderer />
 
+            {/* Status Header */}
+            <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none sm:opacity-100 sm:pointer-events-auto' : 'opacity-100'}`}>
+                <StatusHeader />
+            </div>
+
+            {/* Top Right Profile Button */}
+            <div className={`absolute top-8 right-4 sm:top-8 sm:right-6 z-[60] transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <button
+                    onClick={() => router.push('/dashboard')}
+                    className="p-2 text-white/40 hover:text-white transition-colors"
+                    title="Profile"
+                >
+                    <UserCircle className="w-5 h-5" strokeWidth={2} />
+                </button>
+            </div>
+
             <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 sm:top-6 sm:left-6 sm:translate-x-0 z-50">
-                    <SidebarDock
-                        activePanel={activePanel}
-                        onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
-                    />
-                </div>
+                <SidebarDock
+                    activePanel={activePanel}
+                    onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
+                />
             </div>
 
             {/* Panels - Responsive Width */}
@@ -151,28 +171,47 @@ export function FocusScreen() {
             </div>
 
             {/* Main Content Area */}
-            <div className={`z-10 flex flex-col items-center justify-center w-full px-4 h-full transform-gpu transition-all duration-1000 ${isUserIdle ? 'scale-100 translate-y-0' : 'scale-[0.85] sm:scale-95 md:scale-100 mt-2 sm:mt-10 md:translate-y-[-2rem]'}`}>
-                <div className="relative flex items-center justify-center w-full aspect-square max-w-[min(700px,75vh)]">
-                    <ProgressRing />
+            {/* Scalable Main Composition */}
+            <div className="z-10 flex flex-col items-center justify-center w-full min-h-[115svh] sm:min-h-0 sm:h-full pb-safe">
+                <div className="relative w-full max-w-[min(85vw,500px)] sm:max-w-[min(80vw,600px)] aspect-square flex items-center justify-center -translate-y-6 sm:-translate-y-6">
 
-                    {/* The Heart: Perfectly Centered Timer */}
-                    <div className={`z-20 transition-transform duration-1000 ${isUserIdle ? 'translate-y-10' : ''}`}>
+                    {/* Layer 1: Progress Ring */}
+                    {mode !== 'idle' && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                            <ProgressRing />
+                        </div>
+                    )}
+
+                    {/* Layer 2: Timer Display (Centered) */}
+                    <div className={`absolute inset-0 flex items-center justify-center z-20 transition-all duration-1000 ${isUserIdle ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'}`}>
                         <TimerDisplay />
                     </div>
 
-                    {/* The Context: Task & Action positioned below the center line */}
-                    <div className={`absolute top-[75%] flex flex-col items-center gap-6 sm:gap-10 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 delay-150' : 'opacity-100'}`}>
+                    {/* Layer 3: Task Info (Bottom Half) */}
+                    <div className={`absolute top-[68%] w-full flex flex-col items-center gap-4 z-30 transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                         <ActiveTaskLabel />
+
+                        <div className="flex items-center gap-2.5 rounded-full border border-white/5 bg-white/5 backdrop-blur-md px-5 py-1.5 transition-all hover:bg-white/10 hover:border-white/10">
+                            <Coffee className="h-4 w-4 text-white/30" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                                {breaksLeft} Breaks Left
+                            </span>
+                        </div>
+
                         <div className="mt-2">
                             <PrimaryActionButton />
                         </div>
                     </div>
                 </div>
 
-                {/* Quotes Area - Separated from the center hub for breathing room */}
-                <div className="mt-4 sm:mt-8 transition-opacity duration-1000">
-                    <QuoteDisplay />
-                </div>
+                {/* Layer 4: Quotes (Anchored Bottom) */}
+                {mode !== 'idle' && (
+                    <div className="absolute bottom-20 sm:bottom-12 w-full max-w-4xl px-4 pointer-events-none flex justify-center z-10">
+                        <div className="pointer-events-auto w-full">
+                            <QuoteDisplay />
+                        </div>
+                    </div>
+                )}
             </div>
 
         </main>
