@@ -85,7 +85,7 @@ export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
                     icon={UserCircle}
                     label="Profile"
                     isActive={false} // Always false for now as it navigates away
-                    onClick={() => router.push('/login')}
+                    onClick={() => router.push('/dashboard')}
                 />
             </div>
         </motion.div>
