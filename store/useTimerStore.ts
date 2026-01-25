@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type TimerMode = 'idle' | 'focus' | 'break';
-type BackgroundMode = 'black' | 'lofi' | 'gradient';
+type BackgroundMode = 'gradient' | 'lofi' | 'wallpaper';
 
 interface TimerState {
     mode: TimerMode;
@@ -17,6 +17,7 @@ interface TimerState {
     setActiveTaskId: (id: string | undefined) => void;
     setBackgroundMode: (mode: BackgroundMode) => void;
     setBreaksLeft: (count: number) => void;
+    setSettings: (settings: Partial<TimerState>) => void;
     toggleTimer: () => void;
     resetTimer: () => void;
     restartCurrentSession: () => void;
@@ -31,7 +32,7 @@ export const useTimerStore = create<TimerState>()(
             remainingTime: 25 * 60,
             isRunning: false,
             activeTaskId: '1',
-            backgroundMode: 'gradient',
+            backgroundMode: 'lofi',
             breaksLeft: 4,
 
             setMode: (mode) => set({ mode }),
@@ -40,6 +41,7 @@ export const useTimerStore = create<TimerState>()(
             setActiveTaskId: (activeTaskId) => set({ activeTaskId }),
             setBackgroundMode: (backgroundMode) => set({ backgroundMode }),
             setBreaksLeft: (breaksLeft) => set({ breaksLeft }),
+            setSettings: (settings) => set((state) => ({ ...state, ...settings })),
             toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
             resetTimer: () => set({ remainingTime: 25 * 60, isRunning: false, mode: 'idle', breaksLeft: 4 }),
             restartCurrentSession: () => set((state) => ({

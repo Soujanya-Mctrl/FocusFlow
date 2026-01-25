@@ -9,18 +9,24 @@ import { QuoteDisplay } from './QuoteDisplay';
 import { SidebarDock } from '../layout/SidebarDock';
 import { StatusHeader } from '../layout/StatusHeader';
 import { SidePanel } from '../layout/SidePanel';
-import { TaskPanel } from './TaskPanel';
+import { TaskDashboard } from '../tasks/TaskDashboard';
 import { useTimerStore } from '@/store/useTimerStore';
 import { useTaskStore } from '@/store/useTaskStore';
+import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { playSound, SOUNDS } from '@/utils/sound';
-import { Coffee, UserCircle } from 'lucide-react';
+import { Coffee, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function FocusScreen() {
     const router = useRouter();
-    const { isRunning, remainingTime, setRemainingTime, setIsRunning, mode, setMode, toggleTimer, breaksLeft } = useTimerStore();
+    const {
+        isRunning, remainingTime, setRemainingTime, setIsRunning,
+        mode, setMode, toggleTimer, breaksLeft,
+        backgroundMode, setBackgroundMode
+    } = useTimerStore();
 
     // We can map 'activePanel' string to the Dock.
     const [activePanel, setActivePanel] = useState<string | null>(null);
@@ -125,13 +131,26 @@ export function FocusScreen() {
 
             {/* Top Right Profile Button */}
             <div className={`absolute top-8 right-4 sm:top-8 sm:right-6 z-[60] transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                <button
-                    onClick={() => router.push('/dashboard')}
-                    className="p-2 text-white/40 hover:text-white transition-colors"
-                    title="Profile"
-                >
-                    <UserCircle className="w-5 h-5" strokeWidth={2} />
-                </button>
+                <SignedIn>
+                    <UserButton
+                        appearance={{
+                            baseTheme: dark,
+                            elements: {
+                                userButtonAvatarBox: "w-8 h-8 sm:w-8 sm:h-8 border border-white/10 hover:border-white/20 transition-all",
+                                userButtonTrigger: "focus:outline-none focus:ring-2 focus:ring-accent/50 rounded-full",
+                            }
+                        }}
+                        afterSignOutUrl="/"
+                    />
+                </SignedIn>
+                <SignedOut>
+                    <SignInButton mode="modal">
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white transition-all border border-white/5" title="Sign In">
+                            <User className="w-4 h-4" strokeWidth={2} />
+                            <span className="text-sm font-medium">Sign In</span>
+                        </button>
+                    </SignInButton>
+                </SignedOut>
             </div>
 
             <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
@@ -143,20 +162,50 @@ export function FocusScreen() {
 
             {/* Panels - Responsive Width */}
             <div className="z-[60]">
-                <SidePanel
+                <TaskDashboard
                     isOpen={activePanel === 'tasks'}
                     onClose={() => setActivePanel(null)}
-                    title="Tasks"
-                >
-                    <TaskPanel />
-                </SidePanel>
+                />
+
                 <SidePanel
                     isOpen={activePanel === 'settings'}
                     onClose={() => setActivePanel(null)}
                     title="Settings"
                 >
-                    <div className="p-4 text-center text-text-muted">
-                        Settings coming soon...
+                    <div className="p-6 flex flex-col gap-8">
+                        {/* Background Selection */}
+                        <section>
+                            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-white/30">Background Style</h3>
+                            <div className="grid grid-cols-1 gap-2">
+                                {[
+                                    { id: 'gradient', label: 'Dynamic Gradient', description: 'Deep ambient colors' },
+                                    { id: 'lofi', label: 'Lofi Atmosphere', description: 'Rainy window view' },
+                                    { id: 'wallpaper', label: 'Minimal Wallpaper', description: 'Static mountain range' }
+                                ].map((bg) => (
+                                    <button
+                                        key={bg.id}
+                                        onClick={() => setBackgroundMode(bg.id as any)}
+                                        className={`group flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition-all ${backgroundMode === bg.id
+                                            ? 'border-accent/40 bg-accent/5'
+                                            : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
+                                            }`}
+                                    >
+                                        <div className="flex w-full items-center justify-between">
+                                            <span className={`text-sm font-medium ${backgroundMode === bg.id ? 'text-white' : 'text-white/60'
+                                                }`}>
+                                                {bg.label}
+                                            </span>
+                                            {backgroundMode === bg.id && (
+                                                <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+                                            )}
+                                        </div>
+                                        <span className="text-[10px] text-white/30">{bg.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* Other settings can go here */}
                     </div>
                 </SidePanel>
                 <SidePanel

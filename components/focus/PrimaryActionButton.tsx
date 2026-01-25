@@ -15,7 +15,7 @@ export function PrimaryActionButton() {
             className="flex items-center gap-4 px-6 py-3 sm:px-10 sm:py-4 rounded-full border border-white/5 bg-white/2 backdrop-blur-md shadow-lg shadow-[inset_0_0_12px_rgba(255,255,255,0.05)] text-sm sm:text-base font-bold tracking-widest text-white/90 transition-all hover:border-white/20"
         >
             <span className="ml-1">{isRunning ? 'PAUSE' : 'START'}</span>
-            <span className="flex items-center justify-center rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white/30">
+            <span className="hidden sm:flex items-center justify-center rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white/30">
                 Space
             </span>
         </motion.button>

@@ -1,12 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { StoreSync } from "@/components/auth/StoreSync";
+import { DevTools } from "@/components/debug/DevTools";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
 
 export const metadata: Metadata = {
-  title: "FocusFlow Pomodoro",
-  description: "Calm, distraction-free focus screen.",
+  title: "FocusFlow | Elevate Your Productivity",
+  description: "A premium minimalist focus timer designed for high-performance deep work.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -18,7 +24,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false, // Prevent zooming for native feel
+  userScalable: false,
   themeColor: "#000000",
 };
 
@@ -28,10 +34,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className="dark" suppressHydrationWarning>
+        <body className={`${outfit.variable} font-sans antialiased bg-black text-white`}>
+          <StoreSync />
+          <DevTools />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

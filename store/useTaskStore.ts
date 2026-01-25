@@ -5,18 +5,21 @@ export interface Task {
     id: string;
     title: string;
     completed: boolean;
-    createdAt: number;
+    created_at: number;
+    section: 'today' | 'week' | 'backlog';
 }
 
 interface TaskState {
     tasks: Task[];
     isPanelOpen: boolean;
 
-    addTask: (title: string) => void;
+    addTask: (title: string, section?: Task['section']) => Task;
     removeTask: (id: string) => void;
     toggleTaskCompletion: (id: string) => void;
     setPanelOpen: (isOpen: boolean) => void;
+    setTasks: (tasks: Task[]) => void;
     resetTasks: () => void;
+    moveTask: (id: string, section: Task['section']) => void;
 }
 
 const SEED_TASKS: Task[] = [
@@ -24,25 +27,29 @@ const SEED_TASKS: Task[] = [
         id: '1',
         title: 'Marketing brief',
         completed: false,
-        createdAt: Date.now(),
+        created_at: Date.now(),
+        section: 'today',
     },
     {
         id: '2',
         title: 'Insta post',
         completed: false,
-        createdAt: Date.now() - 1000,
+        created_at: Date.now() - 1000,
+        section: 'week',
     },
     {
         id: '3',
         title: 'Call mum',
         completed: false,
-        createdAt: Date.now() - 2000,
+        created_at: Date.now() - 2000,
+        section: 'backlog',
     },
     {
         id: '4',
         title: 'Fire Jeffry',
         completed: false,
-        createdAt: Date.now() - 3000,
+        created_at: Date.now() - 3000,
+        section: 'today',
     }
 ];
 
@@ -52,17 +59,21 @@ export const useTaskStore = create<TaskState>()(
             tasks: SEED_TASKS,
             isPanelOpen: false,
 
-            addTask: (title) => set((state) => ({
-                tasks: [
-                    {
-                        id: crypto.randomUUID(),
-                        title,
-                        completed: false,
-                        createdAt: Date.now(),
-                    },
-                    ...state.tasks,
-                ],
-            })),
+            addTask: (title, section = 'today') => {
+                const newTask: Task = {
+                    id: crypto.randomUUID(),
+                    title,
+                    completed: false,
+                    created_at: Date.now(),
+                    section,
+                };
+
+                set((state) => ({
+                    tasks: [newTask, ...state.tasks],
+                }));
+
+                return newTask;
+            },
 
             removeTask: (id) => set((state) => ({
                 tasks: state.tasks.filter((t) => t.id !== id),
@@ -74,9 +85,17 @@ export const useTaskStore = create<TaskState>()(
                 ),
             })),
 
-            setPanelOpen: (isOpen) => set({ isPanelOpen: isOpen }),
+            setPanelOpen: (isOpen: boolean) => set({ isPanelOpen: isOpen }),
+
+            setTasks: (tasks) => set({ tasks }),
 
             resetTasks: () => set({ tasks: SEED_TASKS }),
+
+            moveTask: (id, section) => set((state) => ({
+                tasks: state.tasks.map((t) =>
+                    t.id === id ? { ...t, section } : t
+                ),
+            })),
         }),
         {
             name: 'focus-flow-tasks',

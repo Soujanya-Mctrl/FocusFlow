@@ -41,3 +41,20 @@ yarn-error.log*
 next-env.d.ts
 
 PLAN.md
+
+# large assets
+public/lofi_videos/*.webm
+public/lofi_videos/*.mp4
+
+# editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# system
+Thumbs.db
+
+# tools
+.turbo/
+
