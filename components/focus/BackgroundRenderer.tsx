@@ -84,11 +84,11 @@ function BackgroundRendererImpl() {
                                 repeat: Infinity,
                                 ease: "easeInOut"
                             }}
-                            className={`h-full w-full object-cover opacity-70 filter brightness-[0.6] blur-[1px] transition-transform duration-500 ${shouldPan ? 'scale-110' : 'scale-100'}`}
+                            className={`h-full w-full object-cover opacity-70 filter brightness-[0.92] blur-[1px] transition-transform duration-500 ${shouldPan ? 'scale-110' : 'scale-100'}`}
                         >
                             <source src="/lofi_videos/rain.webm" type="video/webm" />
                         </motion.video>
-                        <div className="absolute inset-0 bg-black/5" />
+                        <div className="absolute inset-0 bg-black/1" />
                     </motion.div>
                 )}
 
