@@ -13,13 +13,10 @@ export function StatusHeader() {
         };
         updateTime();
 
-        // Update every minute (or second if we want seconds, but mins is cleaner)
-        const interval = setInterval(updateTime, 1000 * 60);
-        // Sync to minute boundary for cleaner updates?
-        // For simplicity, just every second to catch the minute change quickly.
-        const secondInterval = setInterval(updateTime, 1000);
+        // Update every second to keep the displayed minute synchronized.
+        const interval = setInterval(updateTime, 1000);
 
-        return () => clearInterval(secondInterval);
+        return () => clearInterval(interval);
     }, []);
 
     return (

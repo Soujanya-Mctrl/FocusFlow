@@ -88,7 +88,7 @@ export function StoreSync() {
                 breaksLeft: remoteSettings.breaks_left,
                 mode: remoteSettings.mode,
                 remainingTime: finalRemainingTime,
-                isRunning: remoteSettings.is_ruNnning
+                isRunning: remoteSettings.is_running
             });
         }
     }
