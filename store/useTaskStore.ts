@@ -7,19 +7,30 @@ export interface Task {
     completed: boolean;
     created_at: number;
     section: 'today' | 'week' | 'backlog';
+    durationMinutes?: number;
+    breaks?: number;
 }
 
 interface TaskState {
     tasks: Task[];
     isPanelOpen: boolean;
 
-    addTask: (title: string, section?: Task['section']) => Task;
+    addTask: (
+        title: string,
+        section?: Task['section'],
+        options?: { durationMinutes?: number; breaks?: number }
+    ) => Task;
     removeTask: (id: string) => void;
     toggleTaskCompletion: (id: string) => void;
     setPanelOpen: (isOpen: boolean) => void;
     setTasks: (tasks: Task[]) => void;
     resetTasks: () => void;
     moveTask: (id: string, section: Task['section']) => void;
+    updateTaskTitle: (id: string, title: string) => void;
+    updateTask: (
+        id: string,
+        updates: Partial<Pick<Task, 'title' | 'section' | 'durationMinutes' | 'breaks'>>
+    ) => void;
 }
 
 const SEED_TASKS: Task[] = [
@@ -29,6 +40,8 @@ const SEED_TASKS: Task[] = [
         completed: false,
         created_at: Date.now(),
         section: 'today',
+        durationMinutes: 25,
+        breaks: 4,
     },
     {
         id: '2',
@@ -36,6 +49,8 @@ const SEED_TASKS: Task[] = [
         completed: false,
         created_at: Date.now() - 1000,
         section: 'week',
+        durationMinutes: 25,
+        breaks: 4,
     },
     {
         id: '3',
@@ -43,6 +58,8 @@ const SEED_TASKS: Task[] = [
         completed: false,
         created_at: Date.now() - 2000,
         section: 'backlog',
+        durationMinutes: 25,
+        breaks: 4,
     },
     {
         id: '4',
@@ -50,6 +67,8 @@ const SEED_TASKS: Task[] = [
         completed: false,
         created_at: Date.now() - 3000,
         section: 'today',
+        durationMinutes: 25,
+        breaks: 4,
     }
 ];
 
@@ -59,13 +78,15 @@ export const useTaskStore = create<TaskState>()(
             tasks: SEED_TASKS,
             isPanelOpen: false,
 
-            addTask: (title, section = 'today') => {
+            addTask: (title, section = 'today', options) => {
                 const newTask: Task = {
                     id: crypto.randomUUID(),
                     title,
                     completed: false,
                     created_at: Date.now(),
                     section,
+                    durationMinutes: options?.durationMinutes ?? 25,
+                    breaks: options?.breaks ?? 4,
                 };
 
                 set((state) => ({
@@ -94,6 +115,18 @@ export const useTaskStore = create<TaskState>()(
             moveTask: (id, section) => set((state) => ({
                 tasks: state.tasks.map((t) =>
                     t.id === id ? { ...t, section } : t
+                ),
+            })),
+
+            updateTaskTitle: (id, title) => set((state) => ({
+                tasks: state.tasks.map((t) =>
+                    t.id === id ? { ...t, title } : t
+                ),
+            })),
+
+            updateTask: (id, updates) => set((state) => ({
+                tasks: state.tasks.map((t) =>
+                    t.id === id ? { ...t, ...updates } : t
                 ),
             })),
         }),

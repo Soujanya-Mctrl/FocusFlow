@@ -2,8 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useTaskStore, Task } from '@/store/useTaskStore';
-import { TaskColumn } from '@/components/tasks/TaskColumn';
+import { TaskFlowBoard } from '@/components/tasks/TaskFlowBoard';
 
 interface TaskDashboardProps {
     isOpen: boolean;
@@ -11,13 +10,6 @@ interface TaskDashboardProps {
 }
 
 export function TaskDashboard({ isOpen, onClose }: TaskDashboardProps) {
-    const tasks = useTaskStore((state) => state.tasks);
-
-    // Categorize tasks
-    const backlogTasks = tasks.filter(t => t.section === 'backlog');
-    const weekTasks = tasks.filter(t => t.section === 'week');
-    const todayTasks = tasks.filter(t => t.section === 'today');
-
     return (
         <AnimatePresence>
             {isOpen && (
@@ -39,33 +31,9 @@ export function TaskDashboard({ isOpen, onClose }: TaskDashboardProps) {
                         </button>
                     </div>
 
-                    {/* Columns Container */}
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden">
-                        <div className="h-full flex gap-6 px-6 py-8 min-w-full sm:min-w-0 sm:grid sm:grid-cols-3 sm:gap-8 max-w-7xl mx-auto">
-
-                            {/* Backlog Column */}
-                            <TaskColumn
-                                title="Backlog"
-                                tasks={backlogTasks}
-                                section="backlog"
-                            />
-
-                            {/* This Week Column */}
-                            <TaskColumn
-                                title="This Week"
-                                tasks={weekTasks}
-                                section="week"
-                            />
-
-                            {/* Today Column (Highlighted) */}
-                            <TaskColumn
-                                title="Today"
-                                tasks={todayTasks}
-                                section="today"
-                                isHighlighted
-                            />
-
-                        </div>
+                    {/* Flow Container */}
+                    <div className="flex-1 px-4 py-5 sm:px-6 sm:py-6">
+                        <TaskFlowBoard />
                     </div>
                 </motion.div>
             )}

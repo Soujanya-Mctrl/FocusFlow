@@ -18,6 +18,21 @@ export function DevTools() {
         message: string;
         lastChecked: Date | null;
     }>({ latency: null, ok: false, message: 'Idle', lastChecked: null });
+    const [serviceStatus, setServiceStatus] = useState<{
+        loading: boolean;
+        ok: boolean;
+        message: string;
+        auth: { ok: boolean; status: number | null; latencyMs: number | null };
+        postgrest: { ok: boolean; status: number | null; latencyMs: number | null };
+        lastChecked: Date | null;
+    }>({
+        loading: false,
+        ok: false,
+        message: 'Idle',
+        auth: { ok: false, status: null, latencyMs: null },
+        postgrest: { ok: false, status: null, latencyMs: null },
+        lastChecked: null
+    });
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -68,6 +83,41 @@ export function DevTools() {
         }
     };
 
+    const checkServiceHealth = async () => {
+        setServiceStatus((prev) => ({ ...prev, loading: true, message: 'Checking...' }));
+
+        try {
+            const response = await fetch('/api/health/supabase', { cache: 'no-store' });
+            const data = await response.json();
+
+            setServiceStatus({
+                loading: false,
+                ok: Boolean(data?.ok),
+                message: data?.ok ? 'All Healthy' : 'One or more services unhealthy',
+                auth: {
+                    ok: Boolean(data?.services?.auth?.ok),
+                    status: data?.services?.auth?.status ?? null,
+                    latencyMs: data?.services?.auth?.latencyMs ?? null,
+                },
+                postgrest: {
+                    ok: Boolean(data?.services?.postgrest?.ok),
+                    status: data?.services?.postgrest?.status ?? null,
+                    latencyMs: data?.services?.postgrest?.latencyMs ?? null,
+                },
+                lastChecked: new Date(),
+            });
+        } catch (err: any) {
+            setServiceStatus({
+                loading: false,
+                ok: false,
+                message: `Probe failed: ${err.message || 'Unknown error'}`,
+                auth: { ok: false, status: null, latencyMs: null },
+                postgrest: { ok: false, status: null, latencyMs: null },
+                lastChecked: new Date(),
+            });
+        }
+    };
+
     if (process.env.NODE_ENV === 'production') return null;
 
     return (
@@ -89,6 +139,12 @@ export function DevTools() {
                                 className="px-1.5 py-0.5 bg-white/10 hover:bg-white/20 rounded text-[9px] text-white transition-colors"
                             >
                                 Test DB
+                            </button>
+                            <button
+                                onClick={checkServiceHealth}
+                                className="px-1.5 py-0.5 bg-white/10 hover:bg-white/20 rounded text-[9px] text-white transition-colors"
+                            >
+                                Probe API
                             </button>
                             <span className="text-green-400">● Live</span>
                         </div>
@@ -129,6 +185,27 @@ export function DevTools() {
                         <div className="flex justify-between">
                             <span>Mode:</span>
                             <span className="text-yellow-400">{timer.mode}</span>
+                        </div>
+
+                        <div className="py-1 border-t border-white/5 mt-1">
+                            <div className="flex justify-between">
+                                <span>Probe:</span>
+                                <span className={serviceStatus.ok ? "text-green-400" : "text-yellow-400"}>
+                                    {serviceStatus.loading ? 'Checking...' : serviceStatus.message}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Auth:</span>
+                                <span className={serviceStatus.auth.ok ? "text-green-400" : "text-red-400"}>
+                                    {serviceStatus.auth.status ?? '-'} {serviceStatus.auth.latencyMs !== null ? `(${serviceStatus.auth.latencyMs}ms)` : ''}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>PostgREST:</span>
+                                <span className={serviceStatus.postgrest.ok ? "text-green-400" : "text-red-400"}>
+                                    {serviceStatus.postgrest.status ?? '-'} {serviceStatus.postgrest.latencyMs !== null ? `(${serviceStatus.postgrest.latencyMs}ms)` : ''}
+                                </span>
+                            </div>
                         </div>
                     </div>
 

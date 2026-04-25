@@ -13,15 +13,21 @@
     "@clerk/themes": "^2.4.48",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@supabase/supabase-js": "^2.91.0",
+    "@xyflow/react": "^12.10.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.27.1",
     "lucide-react": "^0.562.0",
-    "next": "16.1.4",
+    "next": "^16.2.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.6.0",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.10"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "workbox-build": "^7.4.0",
+    "workbox-webpack-plugin": "^7.4.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -29,7 +35,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.4",
+    "eslint-config-next": "^16.2.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
