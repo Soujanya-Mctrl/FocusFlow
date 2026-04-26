@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Copy, Trash2, Clock, CheckCircle2, Circle } from 'lucide-react';
+import { Trash2, Clock, CheckCircle2, Circle } from 'lucide-react';
 import { Task, useTaskStore } from '@/store/useTaskStore';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';

@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { UserCircle, Flame, Clock } from 'lucide-react';
 
 export function ProfileSummary() {

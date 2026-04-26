@@ -1,4 +1,8 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
+
+type DocumentPictureInPictureAPI = {
+    requestWindow: (options: { width: number; height: number }) => Promise<Window>;
+};
 
 export function usePiPWindow() {
     const [pipWindow, setPipWindow] = useState<Window | null>(null);
@@ -26,8 +30,10 @@ export function usePiPWindow() {
                 return;
             }
 
-            // @ts-ignore - Document Picture-in-Picture API types might be missing in some TS configs
-            const win = await window.documentPictureInPicture.requestWindow({
+            const pipApi = (window as Window & { documentPictureInPicture?: DocumentPictureInPictureAPI }).documentPictureInPicture;
+            if (!pipApi) return;
+
+            const win = await pipApi.requestWindow({
                 width,
                 height,
             });
@@ -45,7 +51,7 @@ export function usePiPWindow() {
                     const style = document.createElement('style');
                     style.textContent = cssRules;
                     win.document.head.appendChild(style);
-                } catch (e) {
+                } catch {
                     const link = document.createElement('link');
                     link.rel = 'stylesheet';
                     link.type = styleSheet.type;

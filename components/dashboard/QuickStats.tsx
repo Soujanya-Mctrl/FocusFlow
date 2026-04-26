@@ -1,6 +1,6 @@
 'use client';
 
-import { Trophy, Calendar, Zap } from 'lucide-react';
+import { Trophy, Calendar } from 'lucide-react';
 
 export function QuickStats() {
     const stats = [

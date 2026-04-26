@@ -6,6 +6,14 @@ import { useTaskStore } from '@/store/useTaskStore';
 import { useTimerStore } from '@/store/useTimerStore';
 import { useUser } from '@clerk/nextjs';
 
+declare global {
+    interface Window {
+        supabase?: ReturnType<typeof useSupabase>;
+        taskStore?: typeof useTaskStore;
+        timerStore?: typeof useTimerStore;
+    }
+}
+
 export function DevTools() {
     const supabase = useSupabase();
     const tasks = useTaskStore(s => s.tasks);
@@ -36,11 +44,8 @@ export function DevTools() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            // @ts-ignore
             window.supabase = supabase;
-            // @ts-ignore
             window.taskStore = useTaskStore;
-            // @ts-ignore
             window.timerStore = useTimerStore;
 
             console.log('🛠️ DevTools: globals exposed as window.supabase, window.taskStore, window.timerStore');
@@ -73,11 +78,12 @@ export function DevTools() {
                 message: `OK (${count} Tasks)`,
                 lastChecked: new Date()
             });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Unknown';
             setDbStatus({
                 latency: null,
                 ok: false,
-                message: `Error: ${err.message || 'Unknown'}`,
+                message: `Error: ${message}`,
                 lastChecked: new Date()
             });
         }
@@ -106,11 +112,12 @@ export function DevTools() {
                 },
                 lastChecked: new Date(),
             });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Unknown error';
             setServiceStatus({
                 loading: false,
                 ok: false,
-                message: `Probe failed: ${err.message || 'Unknown error'}`,
+                message: `Probe failed: ${message}`,
                 auth: { ok: false, status: null, latencyMs: null },
                 postgrest: { ok: false, status: null, latencyMs: null },
                 lastChecked: new Date(),

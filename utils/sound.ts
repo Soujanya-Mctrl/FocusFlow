@@ -1,9 +1,11 @@
 // Simple synthesized sounds to avoid external asset dependencies
 const getContext = () => {
-    // @ts-ignore - Handle webkit prefix if needed
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return null;
-    return new AudioContext();
+    const AudioContextCtor =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!AudioContextCtor) return null;
+    return new AudioContextCtor();
 };
 
 let audioCtx: AudioContext | null = null;

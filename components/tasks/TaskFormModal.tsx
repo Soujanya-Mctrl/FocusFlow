@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Task } from '@/store/useTaskStore';
@@ -28,12 +28,6 @@ export function TaskFormModal({
     onSubmit,
 }: TaskFormModalProps) {
     const [values, setValues] = useState<TaskFormValues>(initialValues);
-
-    useEffect(() => {
-        if (isOpen) {
-            setValues(initialValues);
-        }
-    }, [initialValues, isOpen]);
 
     if (!isOpen || typeof document === 'undefined') return null;
 

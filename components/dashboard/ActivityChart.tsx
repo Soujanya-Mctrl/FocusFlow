@@ -7,14 +7,10 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer,
-    BarChart,
-    Bar,
-    Cell
+    ResponsiveContainer
 } from 'recharts';
 import { useState } from 'react';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 
 export function ActivityChart() {
     const [view, setView] = useState<'weekly' | 'monthly'>('weekly');

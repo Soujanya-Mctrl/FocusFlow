@@ -11,17 +11,23 @@ import { StatusHeader } from '../layout/StatusHeader';
 import { SidePanel } from '../layout/SidePanel';
 import { TaskDashboard } from '../tasks/TaskDashboard';
 import { useTimerStore } from '@/store/useTimerStore';
-import { useTaskStore } from '@/store/useTaskStore';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import { playSound, SOUNDS } from '@/utils/sound';
 import { Coffee, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+
+const BACKGROUND_OPTIONS: Array<{
+    id: 'gradient' | 'lofi' | 'wallpaper';
+    label: string;
+    description: string;
+}> = [
+    { id: 'gradient', label: 'Dynamic Gradient', description: 'Deep ambient colors' },
+    { id: 'lofi', label: 'Lofi Atmosphere', description: 'Rainy window view' },
+    { id: 'wallpaper', label: 'Minimal Wallpaper', description: 'Static mountain range' },
+];
 
 export function FocusScreen() {
-    const router = useRouter();
     const {
         isRunning, remainingTime, setRemainingTime, setIsRunning,
         mode, setMode, toggleTimer, breaksLeft,
@@ -177,14 +183,10 @@ export function FocusScreen() {
                         <section>
                             <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-white/30">Background Style</h3>
                             <div className="grid grid-cols-1 gap-2">
-                                {[
-                                    { id: 'gradient', label: 'Dynamic Gradient', description: 'Deep ambient colors' },
-                                    { id: 'lofi', label: 'Lofi Atmosphere', description: 'Rainy window view' },
-                                    { id: 'wallpaper', label: 'Minimal Wallpaper', description: 'Static mountain range' }
-                                ].map((bg) => (
+                                {BACKGROUND_OPTIONS.map((bg) => (
                                     <button
                                         key={bg.id}
-                                        onClick={() => setBackgroundMode(bg.id as any)}
+                                        onClick={() => setBackgroundMode(bg.id)}
                                         className={`group flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition-all ${backgroundMode === bg.id
                                             ? 'border-accent/40 bg-accent/5'
                                             : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'

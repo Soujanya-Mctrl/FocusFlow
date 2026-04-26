@@ -3,32 +3,35 @@
 import { useTimerStore } from '@/store/useTimerStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef, useState, memo } from 'react';
+import Image from 'next/image';
 
 function BackgroundRendererImpl() {
     const backgroundMode = useTimerStore((state) => state.backgroundMode) || 'gradient';
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [shouldPan, setShouldPan] = useState(false);
-    const [mounted, setMounted] = useState(false);
+    const [shouldPan, setShouldPan] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const ratio = window.innerWidth / window.innerHeight;
+        const target = 16 / 9;
+        return Math.abs(ratio - target) > 0.05;
+    });
 
     useEffect(() => {
-        setMounted(true);
         const checkRatio = () => {
             const ratio = window.innerWidth / window.innerHeight;
             const target = 16 / 9;
             setShouldPan(Math.abs(ratio - target) > 0.05);
         };
 
-        checkRatio();
         window.addEventListener('resize', checkRatio);
         return () => window.removeEventListener('resize', checkRatio);
     }, []);
 
     useEffect(() => {
-        if (mounted && videoRef.current) {
+        if (videoRef.current) {
             videoRef.current.volume = 0.2;
             const playVideo = () => {
                 if (videoRef.current && videoRef.current.paused) {
-                    videoRef.current.play().catch(e => console.log("Still waiting for interaction to play audio..."));
+                    videoRef.current.play().catch(() => console.log("Still waiting for interaction to play audio..."));
                 }
             };
 
@@ -41,9 +44,7 @@ function BackgroundRendererImpl() {
                 });
             }
         }
-    }, [backgroundMode, mounted]);
-
-    if (!mounted) return null;
+    }, [backgroundMode]);
 
     return (
         <div className="fixed inset-0 z-0 w-full h-full overflow-hidden transition-colors duration-1000 ease-in-out">
@@ -101,9 +102,11 @@ function BackgroundRendererImpl() {
                         transition={{ duration: 1.5 }}
                         className="absolute inset-0 bg-black"
                     >
-                        <img
+                        <Image
                             src="/wallpaper/photo-1485470733090-0aae1788d5af.avif"
                             alt="Background"
+                            fill
+                            sizes="100vw"
                             className="h-full w-full object-cover opacity-80 filter brightness-[0.7]"
                         />
                         <div className="absolute inset-0 bg-black/10" />

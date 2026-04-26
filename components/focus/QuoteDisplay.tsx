@@ -83,7 +83,7 @@ export function QuoteDisplay() {
                         className="flex flex-col gap-4"
                     >
                         <p className="text-sm sm:text-lg font-light text-white/40 leading-relaxed tracking-tight select-none">
-                            "{quote.quote}"
+                            &ldquo;{quote.quote}&rdquo;
                         </p>
                         <div className="flex items-center justify-center gap-3">
                             <div className="h-px w-4 bg-white/10" />

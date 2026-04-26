@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTimerStore } from '@/store/useTimerStore';
 import { useTaskStore } from '@/store/useTaskStore';
-import { Play, Pause, ChevronDown, ChevronUp, CheckCircle, X, Settings, Home, Plus, FileText, ArrowRight, CornerDownLeft, Circle, SkipForward } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Pause, ChevronDown, CheckCircle, X, Settings, Home, Plus, FileText, ArrowRight, CornerDownLeft, Circle, SkipForward } from 'lucide-react';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 export function PiPDisplay({ onClose, pipWindow }: { onClose: () => void, pipWindow: Window }) {
-    const { remainingTime, isRunning, toggleTimer, mode, activeTaskId, setActiveTaskId } = useTimerStore();
+    const { remainingTime, isRunning, toggleTimer, activeTaskId, setActiveTaskId } = useTimerStore();
     const { tasks, toggleTaskCompletion } = useTaskStore();
     const [isExpanded, setIsExpanded] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);

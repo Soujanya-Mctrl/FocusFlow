@@ -1,7 +1,6 @@
 'use client';
 
 import { useTimerStore } from "@/store/useTimerStore";
-import { Play, Pause } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function PrimaryActionButton() {

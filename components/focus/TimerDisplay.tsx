@@ -3,7 +3,7 @@
 import { useTimerStore } from "@/store/useTimerStore";
 import { useTaskStore } from "@/store/useTaskStore";
 import { motion } from "framer-motion";
-import { RotateCcw, Coffee, PictureInPicture2, CheckCircle, SkipForward } from "lucide-react";
+import { RotateCcw, PictureInPicture2, CheckCircle, SkipForward } from "lucide-react";
 import clsx from "clsx";
 import { usePiPWindow } from "@/hooks/usePiPWindow";
 import { createPortal } from "react-dom";
@@ -21,7 +21,6 @@ export function TimerDisplay() {
         toggleTimer,
         mode,
         restartCurrentSession,
-        breaksLeft,
         activeTaskId,
         setActiveTaskId
     } = useTimerStore();

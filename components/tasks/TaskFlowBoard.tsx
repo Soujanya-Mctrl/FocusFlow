@@ -445,6 +445,11 @@ export function TaskFlowBoard() {
             />
 
             <TaskFormModal
+                key={
+                    modalState?.mode === 'edit'
+                        ? `edit-${modalState.taskId}`
+                        : `create-${modalState?.mode === 'create' ? modalState.section : 'today'}`
+                }
                 isOpen={Boolean(modalState && (modalState.mode === 'create' || editingTask))}
                 mode={modalState?.mode ?? 'create'}
                 initialValues={initialTaskFormValues}

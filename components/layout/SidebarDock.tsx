@@ -1,9 +1,8 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { CheckSquare, TrendingUp, Sliders, UserCircle } from "lucide-react";
+import { CheckSquare, TrendingUp, Sliders } from "lucide-react";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
 
 interface DockIconProps {
     icon: React.ElementType;
@@ -52,8 +51,6 @@ interface SidebarDockProps {
 }
 
 export function SidebarDock({ activePanel, onTogglePanel }: SidebarDockProps) {
-    const router = useRouter();
-
     return (
         <motion.div
             initial={{ y: 20, opacity: 0 }}
