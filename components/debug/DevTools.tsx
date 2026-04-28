@@ -128,10 +128,11 @@ export function DevTools() {
     if (process.env.NODE_ENV === 'production') return null;
 
     return (
-        <div className="fixed bottom-4 right-4 z-[9999] font-mono text-[10px]">
+        <div className="fixed bottom-4 right-4 z-[9999] font-mono text-[10px]" suppressHydrationWarning>
             <button
                 onClick={() => setIsVisible(!isVisible)}
                 className="bg-black/50 hover:bg-black/80 text-white/50 hover:text-white px-2 py-1 rounded border border-white/10 backdrop-blur"
+                suppressHydrationWarning
             >
                 {isVisible ? 'Hide DevTools' : '🛠️'}
             </button>

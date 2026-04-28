@@ -9,6 +9,7 @@ import { QuoteDisplay } from './QuoteDisplay';
 import { SidebarDock } from '../layout/SidebarDock';
 import { StatusHeader } from '../layout/StatusHeader';
 import { SidePanel } from '../layout/SidePanel';
+import { CustomBackgroundSelector } from './CustomBackgroundSelector';
 import { TaskDashboard } from '../tasks/TaskDashboard';
 import { useTimerStore } from '@/store/useTimerStore';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
@@ -205,6 +206,12 @@ export function FocusScreen() {
                                     </button>
                                 ))}
                             </div>
+                        </section>
+
+                        {/* Custom Background Upload */}
+                        <section>
+                            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-white/30">Local Media</h3>
+                            <CustomBackgroundSelector />
                         </section>
 
                         {/* Other settings can go here */}

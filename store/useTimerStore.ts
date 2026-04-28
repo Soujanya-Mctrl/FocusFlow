@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 type TimerMode = 'idle' | 'focus' | 'break';
-type BackgroundMode = 'gradient' | 'lofi' | 'wallpaper';
+type BackgroundMode = 'gradient' | 'lofi' | 'wallpaper' | 'custom';
 
 interface TimerState {
     mode: TimerMode;
@@ -10,6 +10,7 @@ interface TimerState {
     activeTaskId?: string;
     backgroundMode: BackgroundMode;
     breaksLeft: number;
+    isBackgroundMuted: boolean;
 
     setMode: (mode: TimerMode) => void;
     setRemainingTime: (time: number) => void;
@@ -17,6 +18,7 @@ interface TimerState {
     setActiveTaskId: (id: string | undefined) => void;
     setBackgroundMode: (mode: BackgroundMode) => void;
     setBreaksLeft: (count: number) => void;
+    setIsBackgroundMuted: (isMuted: boolean) => void;
     setSettings: (settings: Partial<TimerState>) => void;
     toggleTimer: () => void;
     resetTimer: () => void;
@@ -34,6 +36,7 @@ export const useTimerStore = create<TimerState>()(
             activeTaskId: '1',
             backgroundMode: 'lofi',
             breaksLeft: 4,
+            isBackgroundMuted: true,
 
             setMode: (mode) => set({ mode }),
             setRemainingTime: (remainingTime) => set({ remainingTime }),
@@ -41,6 +44,7 @@ export const useTimerStore = create<TimerState>()(
             setActiveTaskId: (activeTaskId) => set({ activeTaskId }),
             setBackgroundMode: (backgroundMode) => set({ backgroundMode }),
             setBreaksLeft: (breaksLeft) => set({ breaksLeft }),
+            setIsBackgroundMuted: (isBackgroundMuted) => set({ isBackgroundMuted }),
             setSettings: (settings) => set((state) => ({ ...state, ...settings })),
             toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
             resetTimer: () => set({ remainingTime: 25 * 60, isRunning: false, mode: 'idle', breaksLeft: 4 }),

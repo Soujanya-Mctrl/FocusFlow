@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className="dark" suppressHydrationWarning>
-        <body className={`${outfit.variable} font-sans antialiased bg-black text-white`}>
+        <body className={`${outfit.variable} font-sans antialiased bg-black text-white`} suppressHydrationWarning={true}>
           <StoreSync />
           <DevTools />
           {children}

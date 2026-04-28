@@ -9,11 +9,16 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import clsx from 'clsx';
 
 export function ActivityChart() {
     const [view, setView] = useState<'weekly' | 'monthly'>('weekly');
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // MOCK DATA for Weekly (Last 7 Days) - Minutes focused
     const weeklyData = [
@@ -33,6 +38,8 @@ export function ActivityChart() {
         { name: 'Week 3', minutes: 510 },
         { name: 'Week 4', minutes: 780 },
     ];
+
+    if (!isMounted) return <div className="h-[350px] w-full bg-white/5 animate-pulse rounded-[2rem]" />;
 
     const data = view === 'weekly' ? weeklyData : monthlyData;
 
