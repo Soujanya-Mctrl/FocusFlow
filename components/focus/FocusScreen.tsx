@@ -7,11 +7,11 @@ import { PrimaryActionButton } from './PrimaryActionButton';
 import { ProgressRing } from './ProgressRing';
 import { QuoteDisplay } from './QuoteDisplay';
 import { SidebarDock } from '../layout/SidebarDock';
-import { StatusHeader } from '../layout/StatusHeader';
 import { SidePanel } from '../layout/SidePanel';
 import { CustomBackgroundSelector } from './CustomBackgroundSelector';
 import { TaskDashboard } from '../tasks/TaskDashboard';
 import { useTimerStore } from '@/store/useTimerStore';
+import { useTaskStore } from '@/store/useTaskStore';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { useEffect, useCallback, useRef, useState } from 'react';
@@ -35,6 +35,9 @@ export function FocusScreen() {
         backgroundMode, setBackgroundMode
     } = useTimerStore();
 
+    const setPanelOpen = useTaskStore(state => state.setPanelOpen);
+    const isPanelOpen = useTaskStore(state => state.isPanelOpen);
+
     // We can map 'activePanel' string to the Dock.
     const [activePanel, setActivePanel] = useState<string | null>(null);
 
@@ -42,8 +45,8 @@ export function FocusScreen() {
 
     // Sync Key shortcut to activePanel
     const toggleTaskPanel = useCallback(() => {
-        setActivePanel(prev => prev === 'tasks' ? null : 'tasks');
-    }, []);
+        setPanelOpen(!isPanelOpen);
+    }, [isPanelOpen, setPanelOpen]);
 
     // Sound Effects
     useEffect(() => {
@@ -131,10 +134,7 @@ export function FocusScreen() {
         <main className={`relative flex h-[100svh] w-full items-center justify-center overflow-y-auto overflow-x-hidden sm:overflow-hidden text-text-primary ${isUserIdle ? 'cursor-none' : ''}`}>
             <BackgroundRenderer />
 
-            {/* Status Header */}
-            <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none sm:opacity-100 sm:pointer-events-auto' : 'opacity-100'}`}>
-                <StatusHeader />
-            </div>
+
 
             {/* Top Right Profile Button */}
             <div className={`absolute top-8 right-4 sm:top-8 sm:right-6 z-[60] transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
@@ -162,16 +162,23 @@ export function FocusScreen() {
 
             <div className={`transition-opacity duration-1000 ${isUserIdle ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                 <SidebarDock
-                    activePanel={activePanel}
-                    onTogglePanel={(panel) => setActivePanel(prev => prev === panel ? null : panel)}
+                    activePanel={isPanelOpen ? 'tasks' : activePanel}
+                    onTogglePanel={(panel) => {
+                        if (panel === 'tasks') {
+                            toggleTaskPanel();
+                        } else {
+                            setActivePanel(prev => prev === panel ? null : panel);
+                            if (isPanelOpen) setPanelOpen(false);
+                        }
+                    }}
                 />
             </div>
 
             {/* Panels - Responsive Width */}
             <div className="z-[60]">
                 <TaskDashboard
-                    isOpen={activePanel === 'tasks'}
-                    onClose={() => setActivePanel(null)}
+                    isOpen={isPanelOpen}
+                    onClose={() => setPanelOpen(false)}
                 />
 
                 <SidePanel

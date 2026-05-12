@@ -10,7 +10,7 @@ export function ActiveTaskLabel() {
     const { tasks } = useTaskStore();
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
-    const isTaskDone = activeTask?.completed ?? false;
+    const isTaskDone = activeTask?.status === 'done';
 
     return (
         <AnimatePresence mode="wait">

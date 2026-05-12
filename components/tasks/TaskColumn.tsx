@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 interface TaskColumnProps {
     title: string;
     tasks: Task[];
-    section: Task['section'];
+    section: string;
     isHighlighted?: boolean;
 }
 
@@ -25,7 +25,7 @@ export function TaskColumn({ title, tasks, section, isHighlighted }: TaskColumnP
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newTaskTitle.trim()) {
-            const newTask = addTask(newTaskTitle, section);
+            const newTask = addTask({ title: newTaskTitle, listId: section });
             setNewTaskTitle('');
             setIsAdding(false);
 
@@ -34,9 +34,9 @@ export function TaskColumn({ title, tasks, section, isHighlighted }: TaskColumnP
                     id: newTask.id,
                     user_id: user.id,
                     title: newTask.title,
-                    completed: newTask.completed,
-                    created_at: newTask.created_at,
-                    section: newTask.section
+                    completed: newTask.status === 'done',
+                    created_at: newTask.createdAt,
+                    section: newTask.listId
                 });
                 if (error) {
                     console.error('Failed to create task:', error);

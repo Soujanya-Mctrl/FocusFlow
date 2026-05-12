@@ -1,116 +1,157 @@
 'use client';
 
-import { useTaskStore } from "@/store/useTaskStore";
-import { useTimerStore } from "@/store/useTimerStore";
-import { Check, Trash2, Plus, Target } from "lucide-react";
-import { useState } from "react";
-import clsx from "clsx";
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Calendar, Inbox, List as ListIcon, 
+    Filter, LayoutGrid, Search, MoreHorizontal,
+    ChevronRight, ChevronLeft
+} from 'lucide-react';
+import { useTaskStore } from '@/store/useTaskStore';
+import { QuickAddBar } from '../tasks/QuickAddBar';
+import { ExpandedTaskPanel } from '../tasks/ExpandedTaskPanel';
+import { TaskCard } from '../tasks/TaskCard';
+import { TaskSidebar } from '../tasks/TaskSidebar';
 
-export function TaskPanel() {
-    const { tasks, addTask, removeTask, toggleTaskCompletion, resetTasks } = useTaskStore();
-    const { activeTaskId, setActiveTaskId } = useTimerStore();
-    const [newTaskTitle, setNewTaskTitle] = useState("");
+export default function TaskPanel() {
+    const [isExpanding, setIsExpanding] = useState(false);
+    const [initialExpandTitle, setInitialExpandTitle] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    
+    const { 
+        tasks, lists, activeListId, setActiveListId,
+        isPanelOpen, setPanelOpen 
+    } = useTaskStore();
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newTaskTitle.trim()) return;
-        addTask(newTaskTitle);
-        setNewTaskTitle("");
-    };
+    const activeList = lists.find(l => l.id === activeListId);
 
-    const handleSelectTask = (id: string) => {
-        if (activeTaskId === id) {
-            setActiveTaskId(undefined);
-        } else {
-            setActiveTaskId(id);
+    const filteredTasks = useMemo(() => {
+        let result = tasks;
+
+        if (activeListId === 'today') {
+            const today = new Date().toISOString().split('T')[0];
+            result = tasks.filter(t => t.scheduledDate?.startsWith(today));
+        } else if (activeListId !== 'all') {
+            result = tasks.filter(t => t.listId === activeListId);
         }
+
+        if (searchQuery) {
+            result = result.filter(t => 
+                t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
+        return result;
+    }, [tasks, activeListId, searchQuery]);
+
+    const handleExpand = (title: string) => {
+        setInitialExpandTitle(title);
+        setIsExpanding(true);
     };
+
+    if (!isPanelOpen) return null;
 
     return (
-        <div className="flex flex-col h-full">
-            {/* Add Task */}
-            <form onSubmit={handleSubmit} className="mb-6 relative shrink-0">
-                <input
-                    type="text"
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    placeholder="Add a new task..."
-                    className="w-full rounded-xl bg-white/5 py-3 pl-4 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-focus"
-                />
-                <button
-                    type="submit"
-                    disabled={!newTaskTitle.trim()}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-focus hover:bg-white/10 disabled:opacity-50"
-                >
-                    <Plus className="w-4 h-4" />
-                </button>
-            </form>
-
-            {/* Task List */}
-            <div className="flex-1 space-y-2">
-                {tasks.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
-                        <span className="text-sm text-gray-500">No tasks yet.</span>
-                        <button
-                            onClick={resetTasks}
-                            className="text-xs px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors border border-white/5"
-                        >
-                            Load Demo Tasks
-                        </button>
-                    </div>
-                )}
-
-                {tasks.map((task) => (
-                    <div
-                        key={task.id}
-                        className={clsx(
-                            "group flex items-center gap-3 rounded-lg p-3 transition-all",
-                            activeTaskId === task.id ? "bg-white/10 border border-focus/30" : "bg-white/5 hover:bg-white/10 border border-transparent",
-                            task.completed && "opacity-50"
-                        )}
+        <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed inset-y-0 right-0 w-[800px] flex z-50 overflow-hidden"
+        >
+            {/* Sidebar Pane */}
+            <AnimatePresence>
+                {isSidebarOpen && (
+                    <motion.div
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 256, opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        className="h-full border-l border-white/5"
                     >
-                        <button
-                            onClick={() => toggleTaskCompletion(task.id)}
-                            className={clsx(
-                                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all",
-                                task.completed ? "bg-complete border-complete text-black" : "border-gray-500 hover:border-gray-300"
-                            )}
-                        >
-                            {task.completed && <Check className="w-3 h-3" />}
-                        </button>
+                        <TaskSidebar />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                        <div className="flex-1 min-w-0">
-                            <p
-                                onClick={() => handleSelectTask(task.id)}
-                                className={clsx(
-                                    "text-sm font-medium truncate cursor-pointer select-none",
-                                    task.completed ? "line-through text-gray-500" : "text-gray-200"
-                                )}
+            {/* Main Task Pane */}
+            <div className="flex-grow bg-black/40 backdrop-blur-3xl border-l border-white/10 flex flex-col relative">
+                {/* Header */}
+                <div className="p-8 pb-4">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center space-x-4">
+                            <button 
+                                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                className="p-2 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-colors"
                             >
-                                {task.title}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                                onClick={() => handleSelectTask(task.id)}
-                                className={clsx(
-                                    "p-1.5 rounded-md transition-colors",
-                                    activeTaskId === task.id ? "text-focus" : "text-gray-400 hover:text-focus hover:bg-white/5"
-                                )}
-                            >
-                                <Target className="w-4 h-4" />
+                                {isSidebarOpen ? <ChevronLeft size={20} /> : <ListIcon size={20} />}
                             </button>
-                            <button
-                                onClick={() => removeTask(task.id)}
-                                className="p-1.5 rounded-md text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
+                            <div>
+                                <h2 className="text-2xl font-bold text-white tracking-tight">
+                                    {activeListId === 'today' ? 'Today' : 
+                                     activeListId === 'all' ? 'Inbox' : 
+                                     activeList?.name || 'Tasks'}
+                                </h2>
+                                <p className="text-xs text-white/30 font-bold uppercase tracking-widest mt-1">
+                                    {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button className="p-2.5 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-colors">
+                                <Search size={20} />
+                            </button>
+                            <button className="p-2.5 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-colors">
+                                <Filter size={20} />
+                            </button>
+                            <button 
+                                onClick={() => setPanelOpen(false)}
+                                className="p-2.5 hover:bg-red-500/10 rounded-xl text-white/40 hover:text-red-400 transition-all ml-2"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <ChevronRight size={20} />
                             </button>
                         </div>
                     </div>
-                ))}
+                </div>
+
+                {/* Content */}
+                <div className="flex-grow overflow-y-auto px-8 pb-8 custom-scrollbar">
+                    <AnimatePresence mode="wait">
+                        {!isExpanding ? (
+                            <QuickAddBar key="quick-add" onExpand={handleExpand} />
+                        ) : (
+                            <ExpandedTaskPanel 
+                                key="expanded-add"
+                                initialTitle={initialExpandTitle} 
+                                onClose={() => setIsExpanding(false)} 
+                            />
+                        )}
+                    </AnimatePresence>
+
+                    {/* Task List */}
+                    <div className="space-y-3 mt-4">
+                        <AnimatePresence initial={false}>
+                            {filteredTasks.length > 0 ? (
+                                filteredTasks.map(task => (
+                                    <TaskCard key={task.id} task={task} />
+                                ))
+                            ) : (
+                                <motion.div 
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="py-32 text-center"
+                                >
+                                    <div className="inline-flex p-6 bg-white/5 rounded-3xl mb-4 text-white/10">
+                                        <LayoutGrid size={48} />
+                                    </div>
+                                    <h3 className="text-white/60 font-semibold text-lg mb-1">Clear Horizon</h3>
+                                    <p className="text-white/20 text-sm">Nothing to do here yet.</p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

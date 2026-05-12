@@ -7,7 +7,7 @@ import { Task } from '@/store/useTaskStore';
 
 export interface TaskFormValues {
     title: string;
-    section: Task['section'];
+    section: string;
     durationMinutes: number;
     breaks: number;
 }
@@ -122,7 +122,7 @@ export function TaskFormModal({
                             onChange={(e) =>
                                 setValues((prev) => ({
                                     ...prev,
-                                    section: e.target.value as Task['section'],
+                                    section: e.target.value,
                                 }))
                             }
                             className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-accent/40"

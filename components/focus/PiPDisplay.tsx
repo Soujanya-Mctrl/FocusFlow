@@ -23,8 +23,8 @@ export function PiPDisplay({ onClose, pipWindow }: { onClose: () => void, pipWin
 
     // Real Task Data
     const activeTask = tasks.find(t => t.id === activeTaskId);
-    const upcomingTasks = tasks.filter(t => t.id !== activeTaskId && !t.completed);
-    const completedTasks = tasks.filter(t => t.completed);
+    const upcomingTasks = tasks.filter(t => t.id !== activeTaskId && t.status !== 'done');
+    const completedTasks = tasks.filter(t => t.status === 'done');
 
     const totalTasks = tasks.length;
     const completedCount = completedTasks.length;
@@ -68,11 +68,11 @@ export function PiPDisplay({ onClose, pipWindow }: { onClose: () => void, pipWin
                     <div className="flex items-center gap-3 overflow-hidden">
                         <div className={clsx(
                             "w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-300",
-                            activeTask?.completed ? "bg-green-500" : "bg-accent animate-pulse"
+                            activeTask?.status === 'done' ? "bg-green-500" : "bg-accent animate-pulse"
                         )} />
                         <span className={clsx(
                             "text-base font-medium truncate opacity-90 leading-none pb-0.5 transition-all duration-300",
-                            activeTask?.completed && "line-through opacity-40"
+                            activeTask?.status === 'done' && "line-through opacity-40"
                         )}>
                             {activeTask ? activeTask.title : "No Active Task"}
                         </span>
@@ -86,14 +86,14 @@ export function PiPDisplay({ onClose, pipWindow }: { onClose: () => void, pipWin
 
                         {/* Hover Controls */}
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <button onClick={markActiveDone} className={clsx("p-1.5 rounded-full hover:bg-white/10 active:scale-95 transition-all", activeTask?.completed ? "text-green-500" : "text-white/50 hover:text-green-500")} title="Done">
+                            <button onClick={markActiveDone} className={clsx("p-1.5 rounded-full hover:bg-white/10 active:scale-95 transition-all", activeTask?.status === 'done' ? "text-green-500" : "text-white/50 hover:text-green-500")} title="Done">
                                 <CheckCircle className="w-4 h-4" />
                             </button>
-                            {activeTask?.completed ? (
+                            {activeTask?.status === 'done' ? (
                                 <button
                                     onClick={() => {
                                         const currentIndex = tasks.findIndex(t => t.id === activeTaskId);
-                                        const nextTask = tasks.find((t, i) => i > currentIndex && !t.completed);
+                                        const nextTask = tasks.find((t, i) => i > currentIndex && t.status !== 'done');
                                         if (nextTask) setActiveTaskId(nextTask.id);
                                     }}
                                     className="p-1.5 rounded-full hover:bg-white/10 active:scale-95 transition-all text-emerald-500 hover:text-emerald-400"
@@ -163,11 +163,11 @@ export function PiPDisplay({ onClose, pipWindow }: { onClose: () => void, pipWin
 
                             <div className="flex items-center gap-4 z-10">
                                 <span className="text-2xl font-bold font-mono tracking-tight text-white">{timeString}</span>
-                                {activeTask.completed ? (
+                                {activeTask.status === 'done' ? (
                                     <button
                                         onClick={() => {
                                             const currentIndex = tasks.findIndex(t => t.id === activeTaskId);
-                                            const nextTask = tasks.find((t, i) => i > currentIndex && !t.completed);
+                                            const nextTask = tasks.find((t, i) => i > currentIndex && t.status !== 'done');
                                             if (nextTask) {
                                                 setActiveTaskId(nextTask.id);
                                             }

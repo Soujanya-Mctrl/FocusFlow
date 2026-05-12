@@ -29,7 +29,7 @@ export function TimerDisplay() {
     const { pipWindow, requestPiP, closePiP } = usePiPWindow();
 
     const activeTask = tasks.find(t => t.id === activeTaskId);
-    const isTaskDone = activeTask?.completed ?? false;
+    const isTaskDone = activeTask?.status === 'done';
 
     return (
         <>
@@ -90,7 +90,7 @@ export function TimerDisplay() {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 const currentIndex = tasks.findIndex(t => t.id === activeTaskId);
-                                const nextTask = tasks.find((t, i) => i > currentIndex && !t.completed);
+                                const nextTask = tasks.find((t, i) => i > currentIndex && t.status !== 'done');
                                 if (nextTask) setActiveTaskId(nextTask.id);
                             }}
                             className="group/btn flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-md transition-all hover:bg-emerald-500/20 hover:border-emerald-500/30 active:scale-95"

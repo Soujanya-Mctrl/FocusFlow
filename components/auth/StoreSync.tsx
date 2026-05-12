@@ -11,7 +11,7 @@ type RemoteTaskRow = {
     title: string;
     completed: boolean;
     created_at: number | string;
-    section?: Task['section'];
+    section?: string;
 };
 
 type RemoteSettingsRow = {
@@ -48,12 +48,16 @@ export function StoreSync() {
         const formattedTasks: Task[] = (remoteTasks as RemoteTaskRow[]).map((task) => ({
             id: task.id,
             title: task.title,
-            completed: task.completed,
-            created_at:
-                typeof task.created_at === 'number'
-                    ? task.created_at
-                    : new Date(task.created_at).getTime(),
-            section: task.section ?? 'today',
+            listId: task.section || 'personal',
+            status: task.completed ? 'done' : 'todo',
+            notes: '',
+            loggedMinutes: 0,
+            subtasks: [],
+            tags: [],
+            createdAt: typeof task.created_at === 'number'
+                ? task.created_at
+                : new Date(task.created_at).getTime(),
+            completedAt: task.completed ? Date.now() : undefined,
         }));
 
         setTasks(formattedTasks);
