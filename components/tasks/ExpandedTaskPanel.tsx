@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
     X, Clock, Calendar, Hash, List as ListIcon, 
-    Plus, ChevronRight, CheckCircle2, Circle
+    Plus, CheckCircle2, Circle
 } from 'lucide-react';
 import { useTaskStore, Subtask } from '@/store/useTaskStore';
 
@@ -27,6 +27,7 @@ export const ExpandedTaskPanel: React.FC<ExpandedTaskPanelProps> = ({ initialTit
         const defaultListId = activeListId === 'today' || activeListId === 'all' 
             ? lists[0]?.id 
             : activeListId;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedListId(defaultListId);
     }, [activeListId, lists]);
 

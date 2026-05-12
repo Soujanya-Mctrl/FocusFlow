@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { useSession } from '@clerk/nextjs';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 
-let globalSupabaseClient: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let currentSession: any = null;
 
 async function supabaseFetch(input: RequestInfo | URL, init?: RequestInit) {
@@ -18,34 +18,33 @@ async function supabaseFetch(input: RequestInfo | URL, init?: RequestInit) {
     });
 }
 
+const globalSupabaseClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+        },
+        global: {
+            fetch: supabaseFetch,
+        },
+    }
+);
+
 export function useSupabase() {
     const { session } = useSession();
     
     // Update the current session reference so the singleton's fetch can use it
-    if (session) {
-        currentSession = session;
-    }
+    useEffect(() => {
+        if (session) {
+            currentSession = session;
+        }
+    }, [session]);
 
     return useMemo(() => {
         if (!session) return null;
-
-        if (!globalSupabaseClient) {
-            globalSupabaseClient = createClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                {
-                    auth: {
-                        persistSession: false,
-                        autoRefreshToken: false,
-                        detectSessionInUrl: false,
-                    },
-                    global: {
-                        fetch: supabaseFetch,
-                    },
-                }
-            );
-        }
-
         return globalSupabaseClient;
     }, [session]);
 }

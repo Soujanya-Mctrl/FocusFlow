@@ -15,6 +15,7 @@ function BackgroundRendererImpl() {
     const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsMounted(true);
         console.log('[BackgroundRenderer] Mounted. Initial Mode:', backgroundMode);
         
@@ -27,7 +28,7 @@ function BackgroundRendererImpl() {
         checkRatio();
         window.addEventListener('resize', checkRatio);
         return () => window.removeEventListener('resize', checkRatio);
-    }, []);
+    }, [backgroundMode]);
 
     // Load custom video if mode is 'custom'
     useEffect(() => {

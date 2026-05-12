@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useTimerStore } from '@/store/useTimerStore';
 import { saveCustomVideo, getCustomVideo, clearCustomVideo } from '@/lib/storage';
 import { Upload, X, Check, Film, Loader2, Volume2, VolumeX } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export function CustomBackgroundSelector() {
     const { backgroundMode, setBackgroundMode, isBackgroundMuted, setIsBackgroundMuted } = useTimerStore();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
     ReactFlow,
     Node,
@@ -8,8 +8,9 @@ import {
     useNodesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Plus, Clock, CheckCircle2, Circle, Play, ListTodo } from 'lucide-react';
+import { Plus, Clock, Check, Play } from 'lucide-react';
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
 import { useTaskStore, Task } from '@/store/useTaskStore';
 import { useTimerStore } from '@/store/useTimerStore';
 
@@ -42,22 +43,26 @@ const BUCKET_META: Record<Bucket, { title: string; x: number; y: number }> = {
 const PANEL_WIDTH = 340;
 const PANEL_HEIGHT = 700;
 const TASK_WIDTH = 300;
-const TASK_GAP = 16;
 
 function PanelNode({ data }: NodeProps<Node<PanelNodeData>>) {
     return (
         <div
             className={clsx(
-                'h-full w-full rounded-[2.5rem] border bg-white/[0.03] backdrop-blur-3xl overflow-hidden pointer-events-auto shadow-2xl',
-                data.isHighlighted ? 'border-accent/40 shadow-accent/5' : 'border-white/5'
+                'flex flex-col h-full w-full rounded-2xl border overflow-hidden p-3 pointer-events-auto transition-all duration-700 glass',
+                data.isHighlighted 
+                    ? 'border-primary-container/20 shadow-[0_0_80px_-20px_rgba(0,245,225,0.15)] bg-white/[0.04]' 
+                    : 'border-white/[0.03] opacity-90 hover:opacity-100 bg-white/[0.01]'
             )}
         >
-            <div className="flex items-center justify-between border-b border-white/5 px-6 py-5 bg-white/[0.02]">
+            <div className="flex items-center justify-between p-4 pb-4">
                 <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-bold text-white/80 tracking-tight">{data.title}</h3>
-                    <span className="rounded-full px-2.5 py-0.5 text-[10px] font-black bg-white/10 text-white/40">
-                        {data.count}
-                    </span>
+                    <h2 className="text-xl font-bold text-white tracking-tight">{data.title}</h2>
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-primary-container/20 blur-md rounded-full" />
+                        <span className="relative bg-white/5 px-2.5 py-1 rounded-full text-[10px] text-primary-container/80 font-black uppercase tracking-widest border border-primary-container/20 backdrop-blur-md">
+                            {data.count}
+                        </span>
+                    </div>
                 </div>
                 <button
                     type="button"
@@ -66,18 +71,18 @@ function PanelNode({ data }: NodeProps<Node<PanelNodeData>>) {
                         e.stopPropagation();
                         data.onAddTask(data.bucket);
                     }}
-                    className="nodrag nopan flex items-center gap-1.5 rounded-full border border-white/5 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/50 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                    className="nodrag nopan flex items-center gap-2 px-5 py-2 bg-primary-container text-on-primary-container hover:bg-primary-container/90 transition-all rounded-full text-[10px] active:scale-95 font-black uppercase tracking-[0.15em] shadow-[0_0_20px_rgba(0,245,225,0.2)] hover:shadow-[0_0_30px_rgba(0,245,225,0.4)]"
                 >
-                    <Plus className="h-3.5 w-3.5" />
+                    <Plus className="h-4 w-4 stroke-[3]" />
                     New
                 </button>
             </div>
-            <div className="pointer-events-none h-full w-full" />
+            <div className="pointer-events-none flex-1 h-full w-full" />
         </div>
     );
 }
 
-function TaskNode({ data }: NodeProps<Node<TaskNodeData>>) {
+function TaskNode({ data, dragging }: NodeProps<Node<TaskNodeData>>) {
     const { task } = data;
     const completedSubtasks = task.subtasks.filter(s => s.done).length;
     const totalSubtasks = task.subtasks.length;
@@ -87,12 +92,29 @@ function TaskNode({ data }: NodeProps<Node<TaskNodeData>>) {
         <div
             onClick={() => data.onSelectTask(task.id)}
             className={clsx(
-                'group w-full rounded-2xl border bg-zinc-950/80 px-5 py-4 shadow-xl transition-all pointer-events-auto hover:translate-y-[-2px] cursor-pointer',
-                data.isSelected ? 'border-accent shadow-accent/10' : 'border-white/10 hover:border-white/20',
-                task.status === 'done' ? 'opacity-50' : ''
+                'group w-full border rounded-2xl p-5 transition-all duration-300 cursor-pointer pointer-events-auto relative overflow-hidden',
+                dragging 
+                    ? 'bg-surface-container-highest/90 border-primary-container/50 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] rotate-2 scale-105 z-[100]' 
+                    : data.isSelected 
+                        ? 'bg-surface-container-high border-primary-container/50 shadow-[0_0_40px_-10px_rgba(0,245,225,0.3)] scale-[1.02] z-20' 
+                        : 'bg-surface-container-low border-white/[0.04] hover:border-primary-container/20 hover:bg-surface-container-high hover:scale-[1.01] shadow-xl',
+                task.status === 'done' && !dragging ? 'opacity-40' : ''
             )}
         >
-            <div className="flex items-start gap-4">
+            {/* Ambient Background Gradient */}
+            <div className={clsx(
+                'absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none',
+                task.priority === 'high' ? 'bg-gradient-to-br from-error/40 to-transparent' : 
+                'bg-gradient-to-br from-primary-container/40 to-transparent'
+            )} />
+
+            {/* Selection/Focus Glow */}
+            {data.isSelected && (
+                <div className="absolute inset-0 rounded-2xl bg-primary-container/[0.03] blur-2xl pointer-events-none" />
+            )}
+
+            <div className="flex items-start gap-5 relative">
+                {/* Circular Pill-style Checkbox */}
                 <button
                     type="button"
                     onClick={(e) => {
@@ -100,70 +122,92 @@ function TaskNode({ data }: NodeProps<Node<TaskNodeData>>) {
                         data.onToggleTask(task.id);
                     }}
                     className={clsx(
-                        'nodrag nopan mt-0.5 transition-colors shrink-0',
-                        task.status === 'done' ? 'text-accent' : 'text-white/20 hover:text-white/60'
+                        'nodrag nopan mt-0.5 flex-shrink-0 w-6 h-6 rounded-full border-2 transition-all flex items-center justify-center',
+                        task.status === 'done' 
+                            ? 'bg-primary-container border-primary-container text-on-primary-container shadow-[0_0_15px_rgba(0,245,225,0.4)]' 
+                            : 'border-white/10 bg-white/[0.02] group-hover:border-primary-container/40'
                     )}
                 >
-                    {task.status === 'done' ? <CheckCircle2 className="h-6 w-6" /> : <Circle className="h-6 w-6" />}
+                    {task.status === 'done' && <Check className="h-3.5 w-3.5 stroke-[4]" />}
                 </button>
 
-                <div className="min-w-0 flex-1">
-                    <p className={clsx(
-                        'truncate text-[15px] font-bold tracking-tight',
-                        task.status === 'done' ? 'text-white/20 line-through' : 'text-white/90'
+                <div className="flex-1 min-w-0">
+                    <h3 className={clsx(
+                        'text-lg font-bold mb-4 truncate transition-colors leading-tight tracking-tight',
+                        task.status === 'done' ? 'text-white/20 line-through' : 'text-white/90 group-hover:text-white'
                     )}>
                         {task.title}
-                    </p>
+                    </h3>
                     
                     {totalSubtasks > 0 && (
-                        <div className="mt-3 flex flex-col gap-1.5">
-                            <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-white/20">
+                        <div className="space-y-2.5 mb-5">
+                            <div className="flex justify-between items-center text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">
                                 <span>Subtasks</span>
-                                <span>{completedSubtasks}/{totalSubtasks}</span>
+                                <span className={clsx(
+                                    'transition-colors font-black',
+                                    progress === 100 ? 'text-primary-container' : 'text-white/40'
+                                )}>{completedSubtasks}/{totalSubtasks}</span>
                             </div>
-                            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-accent transition-all duration-500 ease-out" 
-                                    style={{ width: `${progress}%` }} 
+                            <div className="h-1.5 w-full bg-white/[0.03] rounded-full overflow-hidden">
+                                <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${progress}%` }}
+                                    transition={{ type: "spring", bounce: 0, duration: 1 }}
+                                    className={clsx(
+                                        'h-full rounded-full transition-all duration-500',
+                                        progress === 100 ? 'bg-primary-container shadow-[0_0_12px_rgba(0,245,225,0.5)]' : 'bg-primary-container/60'
+                                    )} 
                                 />
                             </div>
                         </div>
                     )}
 
-                    <div className="mt-3 flex items-center gap-3 text-[10px] font-bold text-white/30">
-                        <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{task.estimatedMinutes ?? 25}m</span>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 bg-white/[0.03] px-3 py-1 rounded-full border border-white/[0.03]">
+                            <Clock className="h-3.5 w-3.5 text-primary-container/40" />
+                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{task.estimatedMinutes ?? 25}m</span>
                         </div>
-                        {task.tags.length > 0 && (
-                            <div className="flex items-center gap-1">
-                                <ListTodo className="h-3 w-3" />
-                                <span className="truncate max-w-[80px]">{task.tags[0]}</span>
+                        {task.priority === 'high' && (
+                            <div className="flex items-center gap-2 bg-error/5 px-3 py-1 rounded-full border border-error/10">
+                                <div className="w-1.5 h-1.5 rounded-full bg-error shadow-[0_0_8px_rgba(255,82,82,0.4)]" />
+                                <span className="text-[10px] font-black text-error/80 uppercase tracking-widest">High</span>
+                            </div>
+                        )}
+                        {task.tags && task.tags.length > 0 && (
+                            <div className="flex items-center gap-2 bg-white/[0.03] px-3 py-1 rounded-full border border-white/[0.03]">
+                                <span className="text-[10px] font-black text-white/30 uppercase tracking-widest truncate max-w-[80px]">#{task.tags[0]}</span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
                     type="button"
                     onClick={(e) => {
                         e.stopPropagation();
                         data.onPlayTask(task.id);
                     }}
-                    className="nodrag nopan rounded-full p-2 bg-accent/5 text-accent opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-black"
+                    className="nodrag nopan flex-shrink-0 w-10 h-10 rounded-full bg-primary-container text-on-primary-container items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-[0_8px_20px_rgba(0,245,225,0.3)] hover:shadow-[0_12px_30px_rgba(0,245,225,0.5)] flex"
                 >
-                    <Play className="h-4 w-4 fill-current" />
-                </button>
+                    <Play className="h-4 w-4 fill-current ml-0.5" />
+                </motion.button>
             </div>
         </div>
     );
 }
 
 function getTaskBucket(task: Task): Bucket {
-    const todayStr = new Date().toISOString().split('T')[0];
-    if (task.scheduledDate?.startsWith(todayStr)) return 'today';
-    if (task.scheduledDate) return 'upcoming';
-    return 'backlog';
+    if (!task.scheduledDate) return 'backlog';
+    
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const taskDateStr = task.scheduledDate.split('T')[0];
+    
+    // If scheduled date is today or in the past, it goes to Today bucket
+    if (taskDateStr <= todayStr) return 'today';
+    return 'upcoming';
 }
 
 function resolveBucketFromX(centerX: number): Bucket {
@@ -190,6 +234,8 @@ export function TaskFlowBoard({
     onSelectTask: (id: string | null) => void 
 }) {
     const tasks = useTaskStore((state) => state.tasks);
+    const lists = useTaskStore((state) => state.lists);
+    const activeListId = useTaskStore((state) => state.activeListId);
     const addTask = useTaskStore((state) => state.addTask);
     const updateTask = useTaskStore((state) => state.updateTask);
     const toggleTaskCompletion = useTaskStore((state) => state.toggleTaskCompletion);
@@ -198,10 +244,24 @@ export function TaskFlowBoard({
     const setBreaksLeft = useTimerStore((state) => state.setBreaksLeft);
 
     const onAddTask = useCallback((bucket: Bucket) => {
-        const scheduledDate = bucket === 'today' ? new Date().toISOString() : undefined;
-        const newTask = addTask({ title: 'New Task', listId: 'personal', scheduledDate });
+        let scheduledDate: string | undefined;
+        
+        if (bucket === 'today') {
+            scheduledDate = new Date().toISOString().split('T')[0];
+        } else if (bucket === 'upcoming') {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            scheduledDate = tomorrow.toISOString().split('T')[0];
+        } else {
+            scheduledDate = undefined;
+        }
+
+        const isProject = lists.some(l => l.id === activeListId);
+        const listId = isProject ? activeListId : (lists.length > 0 ? lists[0].id : 'personal');
+        
+        const newTask = addTask({ title: 'New Task', listId, scheduledDate });
         onSelectTask(newTask.id);
-    }, [addTask, onSelectTask]);
+    }, [addTask, onSelectTask, activeListId, lists]);
 
     const onToggleTask = useCallback((taskId: string) => {
         toggleTaskCompletion(taskId);
@@ -226,6 +286,23 @@ export function TaskFlowBoard({
         task: TaskNode,
     }), []);
 
+    const filteredTasks = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        
+        switch (activeListId) {
+            case 'all':
+                return tasks;
+            case 'today':
+                // Today filter: Scheduled for today or overdue
+                return tasks.filter(t => t.scheduledDate && t.scheduledDate <= todayStr);
+            case 'starred':
+                return tasks.filter(t => t.priority === 'high');
+            default:
+                // Assume it's a specific list ID
+                return tasks.filter(t => t.listId === activeListId);
+        }
+    }, [tasks, activeListId]);
+
     useEffect(() => {
         const buildNodes = (): Node[] => {
             const panelNodes: Node<PanelNodeData>[] = BUCKET_ORDER.map((bucket) => ({
@@ -237,7 +314,7 @@ export function TaskFlowBoard({
                 data: {
                     title: BUCKET_META[bucket].title,
                     bucket,
-                    count: tasks.filter((t) => getTaskBucket(t) === bucket).length,
+                    count: filteredTasks.filter((t) => getTaskBucket(t) === bucket).length,
                     isHighlighted: bucket === 'today',
                     onAddTask,
                 },
@@ -246,14 +323,14 @@ export function TaskFlowBoard({
 
             const taskNodes: Node<TaskNodeData>[] = [];
             for (const bucket of BUCKET_ORDER) {
-                const bucketTasks = tasks.filter((t) => getTaskBucket(t) === bucket);
+                const bucketTasks = filteredTasks.filter((t) => getTaskBucket(t) === bucket);
                 bucketTasks.forEach((task, index) => {
                     taskNodes.push({
                         id: `task-${task.id}`,
                         type: 'task',
                         position: {
                             x: BUCKET_META[bucket].x + 20,
-                            y: BUCKET_META[bucket].y + 84 + index * 105, // Approximation for TASK_HEIGHT + TASK_GAP
+                            y: BUCKET_META[bucket].y + 84 + index * 125, // Increased vertical gap for better spacing
                         },
                         data: {
                             task,
@@ -271,7 +348,7 @@ export function TaskFlowBoard({
         };
 
         setNodes(buildNodes());
-    }, [onAddTask, onPlayTask, onToggleTask, handleSelectTask, setNodes, tasks, selectedTaskId]);
+    }, [onAddTask, onPlayTask, onToggleTask, handleSelectTask, setNodes, filteredTasks, selectedTaskId]);
 
     const onNodeDragStop = useCallback((_: React.MouseEvent, node: Node) => {
         if (!node.id.startsWith('task-')) return;
@@ -286,12 +363,12 @@ export function TaskFlowBoard({
         if (nextBucket === currentBucket) return;
 
         if (nextBucket === 'today') {
-            updateTask(taskId, { scheduledDate: new Date().toISOString() });
+            updateTask(taskId, { scheduledDate: new Date().toISOString().split('T')[0] });
         } else if (nextBucket === 'upcoming') {
              // Set to tomorrow if moving to upcoming and was today
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            updateTask(taskId, { scheduledDate: tomorrow.toISOString() });
+            updateTask(taskId, { scheduledDate: tomorrow.toISOString().split('T')[0] });
         } else {
             updateTask(taskId, { scheduledDate: undefined });
         }

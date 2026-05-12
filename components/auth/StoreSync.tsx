@@ -187,13 +187,13 @@ export function StoreSync() {
                     table: 'user_settings',
                     filter: `user_id=eq.${user.id}`,
                 },
-                (payload: any) => {
+                (payload) => {
                     const next = payload.new as Partial<RemoteSettingsRow>;
                     if (!next || !next.user_id) return;
                     applyRemoteSettings(next as RemoteSettingsRow);
                 }
             )
-            .subscribe((status: any) => {
+            .subscribe((status) => {
                 if (status === 'SUBSCRIBED') {
                     void pullData(user.id);
                 }

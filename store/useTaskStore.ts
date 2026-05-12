@@ -21,6 +21,7 @@ export interface Task {
     subtasks: Subtask[];
     tags: string[];
     status: TaskStatus;
+    priority?: 'low' | 'medium' | 'high';
     createdAt: number;
     completedAt?: number;
 }
@@ -95,7 +96,7 @@ export const useTaskStore = create<TaskState>()(
         (set) => ({
             tasks: SEED_TASKS,
             lists: DEFAULT_LISTS,
-            activeListId: 'today',
+            activeListId: 'all',
             isPanelOpen: false,
 
             addList: (name, icon, color) => set((state) => ({
@@ -123,12 +124,13 @@ export const useTaskStore = create<TaskState>()(
             addTask: (data) => {
                 const newTask: Task = {
                     id: crypto.randomUUID(),
-                    listId: data.listId,
+                    listId: data.listId || 'all',
                     title: data.title,
                     notes: data.notes || '',
                     estimatedMinutes: data.estimatedMinutes,
                     loggedMinutes: 0,
                     status: 'todo',
+                    priority: data.priority,
                     scheduledDate: data.scheduledDate,
                     scheduledTime: data.scheduledTime,
                     subtasks: data.subtasks || [],

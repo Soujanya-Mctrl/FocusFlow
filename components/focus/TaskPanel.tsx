@@ -3,8 +3,8 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    Calendar, Inbox, List as ListIcon, 
-    Filter, LayoutGrid, Search, MoreHorizontal,
+    List as ListIcon, 
+    Filter, LayoutGrid, Search,
     ChevronRight, ChevronLeft
 } from 'lucide-react';
 import { useTaskStore } from '@/store/useTaskStore';
@@ -16,11 +16,11 @@ import { TaskSidebar } from '../tasks/TaskSidebar';
 export default function TaskPanel() {
     const [isExpanding, setIsExpanding] = useState(false);
     const [initialExpandTitle, setInitialExpandTitle] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     
     const { 
-        tasks, lists, activeListId, setActiveListId,
+        tasks, lists, activeListId,
         isPanelOpen, setPanelOpen 
     } = useTaskStore();
 

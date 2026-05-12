@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
     Play, Pause, SkipForward, CheckCircle2, 
-    X, Maximize2, Minimize2 
+    Maximize2
 } from 'lucide-react';
 import { useTimerStore } from '@/store/useTimerStore';
 import { useTaskStore } from '@/store/useTaskStore';
@@ -12,7 +12,7 @@ import { useTaskStore } from '@/store/useTaskStore';
 export const FlowModePanel: React.FC = () => {
     const { 
         remainingTime, isRunning, mode, activeTaskId,
-        toggleTimer, resetTimer, setMode 
+        toggleTimer
     } = useTimerStore();
     
     const { tasks, toggleTaskCompletion } = useTaskStore();
